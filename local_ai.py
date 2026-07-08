@@ -145,20 +145,14 @@ the visitor's words verbatim. Return exactly this format, with no introduction:
     with _model_lock:
         answer = load_model().ask(prompt)
 
-    past_match = re.search(r"<PAST>\s*(.*?)\s*</PAST>", answer, re.I | re.S)
-    future_match = re.search(r"<FUTURE>\s*(.*?)\s*</FUTURE>", answer, re.I | re.S)
+    parsed = _parse_combined_answer(answer)
+    if parsed:
+        return parsed
 
-    if not past_match or not future_match:
-        raise RuntimeError(
-            "The local model answered, but did not use the PAST/FUTURE format."
-        )
-
-    past_response = _clean_response(past_match.group(1))
-    future_response = _clean_response(future_match.group(1))
-    if not past_response or not future_response:
-        raise RuntimeError("The local model returned an empty response.")
-
-    return past_response, future_response
+    # Small local models occasionally ignore formatting even when the prompt
+    # is explicit. Two simple follow-up requests are slower, but they require
+    # no parsing and keep the installation reliable.
+    return _generate_separately(situation)
 
 
 def get_ai_status():
@@ -178,8 +172,90 @@ def get_ai_status():
 def _clean_response(text):
     """Remove model formatting that would look odd on the installation."""
 
-    text = re.sub(r"\s+", " ", str(text)).strip()
+    text = str(text)
+    # Some Qwen-family models expose an optional reasoning block. It is useful
+    # internally but should never appear as part of the artwork response.
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.I | re.S)
+    text = re.sub(r"</?(?:PAST|FUTURE)>", "", text, flags=re.I)
+    text = re.sub(
+        r"^\s*(?:[#>*-]\s*)*(?:\*\*)?(?:PAST|FUTURE)(?:\s+SELF)?"
+        r"(?:\*\*)?\s*[:：-]?\s*",
+        "",
+        text,
+        flags=re.I,
+    )
+    text = re.sub(r"^\s*[*_`]+\s*", "", text)
+    text = re.sub(r"\s*[*_`]+\s*$", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
     return text.strip(' "\'')
+
+
+def _parse_combined_answer(answer):
+    """Accept XML tags as well as labels commonly used by small models."""
+
+    answer = re.sub(r"<think>.*?</think>", "", str(answer), flags=re.I | re.S)
+
+    # Preferred format: <PAST>...</PAST> and <FUTURE>...</FUTURE>.
+    past_match = re.search(r"<PAST>\s*(.*?)\s*</PAST>", answer, re.I | re.S)
+    future_match = re.search(
+        r"<FUTURE>\s*(.*?)\s*</FUTURE>", answer, re.I | re.S
+    )
+    if past_match and future_match:
+        return _valid_pair(past_match.group(1), future_match.group(1))
+
+    # Also accept forms such as PAST:, **Past Self:**, or ## FUTURE SELF -.
+    label_pattern = re.compile(
+        r"(?:^|\n)\s*(?:[#>*-]+\s*)*(?:\*\*)?"
+        r"(PAST(?:\s+SELF)?|FUTURE(?:\s+SELF)?)"
+        r"\s*[:：-]\s*(?:\*\*)?\s*",
+        re.I,
+    )
+    labels = list(label_pattern.finditer(answer))
+    sections = {}
+    for index, label in enumerate(labels):
+        start = label.end()
+        end = labels[index + 1].start() if index + 1 < len(labels) else len(answer)
+        key = "past" if label.group(1).lower().startswith("past") else "future"
+        sections[key] = answer[start:end]
+
+    if "past" in sections and "future" in sections:
+        return _valid_pair(sections["past"], sections["future"])
+    return None
+
+
+def _valid_pair(past_text, future_text):
+    """Clean a parsed pair and reject empty sections."""
+
+    past_response = _clean_response(past_text)
+    future_response = _clean_response(future_text)
+    if past_response and future_response:
+        return past_response, future_response
+    return None
+
+
+def _generate_separately(situation):
+    """Reliable fallback when the combined answer cannot be separated."""
+
+    past_prompt = f"""The visitor says: {situation}
+
+Reply as their past self. Be gentle, sincere, reflective, and slightly
+vulnerable, remembering where they came from. Write only the response: 2 or 3
+short sentences, under 65 words. Do not add a title, label, or explanation."""
+
+    future_prompt = f"""The visitor says: {situation}
+
+Reply as their future self. Be calm, grounded, wise, and reassuring, looking
+back at their present moment. Write only the response: 2 or 3 short sentences,
+under 65 words. Do not add a title, label, or explanation."""
+
+    with _model_lock:
+        model = load_model()
+        past_response = _clean_response(model.ask(past_prompt))
+        future_response = _clean_response(model.ask(future_prompt))
+
+    if not past_response or not future_response:
+        raise RuntimeError("The local model returned an empty response.")
+    return past_response, future_response
 
 
 if __name__ == "__main__":
