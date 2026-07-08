@@ -108,6 +108,16 @@ def load_model():
 
             candidate = LLM(**settings)
             candidate.load()
+
+            # Qwen uses a ChatML-style conversation template. Some GGUF files
+            # do not expose enough metadata for llama-cpp-python to select it
+            # automatically, which can result in multilingual token garbage.
+            # Setting it explicitly is harmless when the metadata is correct.
+            if getattr(candidate, "model", None) is not None:
+                candidate.model.chat_format = os.getenv(
+                    "SELFCHAT_CHAT_FORMAT", "chatml"
+                )
+
             _model = candidate
             _load_error = ""
             return _model
