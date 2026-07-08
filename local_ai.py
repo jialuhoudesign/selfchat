@@ -147,10 +147,12 @@ FUTURE SELF: calm, grounded, wise and reassuring. Speak like a future version
 looking back at this present moment.
 
 Each response must be 2 or 3 short sentences and under 65 words. Do not repeat
-the visitor's words verbatim. Return exactly this format, with no introduction:
+the visitor's words verbatim. Do not copy phrases from these instructions.
 
-<PAST>past response here</PAST>
-<FUTURE>future response here</FUTURE>"""
+Return exactly two sections. Start with the opening tag <PAST>, immediately
+write the original Past Self response, and close it with </PAST>. Then start
+<FUTURE>, immediately write the original Future Self response, and close it
+with </FUTURE>. Add no introduction, headings, placeholders, or explanation."""
 
     with _model_lock:
         answer = load_model().ask(prompt)
@@ -238,7 +240,7 @@ def _valid_pair(past_text, future_text):
 
     past_response = _clean_response(past_text)
     future_response = _clean_response(future_text)
-    if past_response and future_response:
+    if _response_is_usable(past_response) and _response_is_usable(future_response):
         return past_response, future_response
     return None
 
@@ -263,9 +265,56 @@ under 65 words. Do not add a title, label, or explanation."""
         past_response = _clean_response(model.ask(past_prompt))
         future_response = _clean_response(model.ask(future_prompt))
 
-    if not past_response or not future_response:
-        raise RuntimeError("The local model returned an empty response.")
+    if not _response_is_usable(past_response) or not _response_is_usable(
+        future_response
+    ):
+        raise RuntimeError(
+            "The local model returned unreadable text; using the safe fallback."
+        )
     return past_response, future_response
+
+
+def _response_is_usable(text):
+    """Reject token garbage before it can appear on an exhibition screen.
+
+    The current artwork explicitly asks for short English responses. A small
+    number of typographic Unicode characters is fine, but large amounts of
+    mixed writing systems, code fragments, or excessive length usually mean
+    that the GGUF/runtime combination generated invalid tokens.
+    """
+
+    if not text or len(text) < 12 or len(text) > 520:
+        return False
+
+    lowered = text.lower().strip(" .:;!?")
+    copied_placeholders = {
+        "past response here",
+        "future response here",
+        "response here",
+    }
+    if lowered in copied_placeholders or "response here" in lowered:
+        return False
+
+    words = re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", text)
+    if len(words) < 4 or len(words) > 95:
+        return False
+
+    visible_characters = [character for character in text if not character.isspace()]
+    if not visible_characters:
+        return False
+
+    english_friendly = sum(
+        character.isascii() or character in "—–‘’“”…"
+        for character in visible_characters
+    )
+    if english_friendly / len(visible_characters) < 0.92:
+        return False
+
+    suspicious_symbols = sum(character in "\\{}[]<>|" for character in text)
+    if suspicious_symbols > 4:
+        return False
+
+    return True
 
 
 if __name__ == "__main__":
