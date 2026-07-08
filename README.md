@@ -105,6 +105,24 @@ python app.py
 Keep the large model and the supplied hardware toolkit in their existing
 `yourPrototype` folder. Do not commit the `models/` folder to GitHub.
 
+The simplest recommended folder layout is:
+
+```text
+yourPrototype/
+├── llm/
+├── models/
+├── initdemo.sh
+└── selfchat/          # clone this GitHub repository here
+    ├── app.py
+    ├── local_ai.py
+    ├── templates/
+    └── static/
+```
+
+With this layout, SelfChat automatically finds `../llm/llm.py`; setting
+`SELFCHAT_TOOLKIT_PATH` is optional. Copying only `app.py` and `local_ai.py`
+does not work because Flask also needs the `templates/` and `static/` folders.
+
 First enter the supplied toolkit folder and initialise its Python environment:
 
 ```bash

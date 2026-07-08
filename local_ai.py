@@ -24,9 +24,18 @@ _model_lock = threading.RLock()
 def find_toolkit_root():
     """Find the supplied Raspberry Pi toolkit without hard-coding one user."""
 
-    candidates = []
+    # Support both convenient Raspberry Pi layouts:
+    #
+    #   yourPrototype/app.py
+    #   yourPrototype/selfchat/app.py   (recommended for clean Git updates)
+    #
+    # In both cases the toolkit's llm/ folder can be found without an
+    # environment variable.
+    app_folder = Path(__file__).resolve().parent
+    candidates = [app_folder, app_folder.parent]
     if TOOLKIT_ENV:
-        candidates.append(Path(TOOLKIT_ENV).expanduser())
+        # An explicit setting comes first when the user has supplied one.
+        candidates.insert(0, Path(TOOLKIT_ENV).expanduser())
 
     # These cover the folder shown in the supplied toolkit documentation and
     # common locations when the Pi username is not literally "pi".
