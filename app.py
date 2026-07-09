@@ -450,4 +450,5 @@ def reset():
 if __name__ == "__main__":
     # host="0.0.0.0" also lets another device on the same local network open
     # the installation.  debug is intentionally off for exhibition stability.
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    port = int(os.environ.get("SELFCHAT_PORT", "5001"))
+    app.run(host="0.0.0.0", port=port, debug=False)
