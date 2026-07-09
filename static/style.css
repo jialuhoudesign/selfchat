@@ -42,6 +42,48 @@ button, textarea { font: inherit; }
   isolation: isolate;
 }
 
+.temporal-screen::before,
+.temporal-screen::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -18vmax;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+
+.temporal-screen::before {
+  background:
+    repeating-radial-gradient(circle at center,
+      rgba(255,255,255,0) 0,
+      rgba(255,255,255,0) 7vmin,
+      rgba(255,255,255,.18) 7.4vmin,
+      rgba(255,255,255,0) 8.2vmin);
+  animation: time-rings 1.35s linear infinite;
+}
+
+.temporal-screen::after {
+  background:
+    conic-gradient(from 0deg,
+      rgba(255,255,255,0),
+      rgba(255,255,255,.30),
+      rgba(255,255,255,0),
+      rgba(255,255,255,.18),
+      rgba(255,255,255,0));
+  mix-blend-mode: screen;
+  animation: time-spin 1.8s linear infinite;
+}
+
+.display.is-thinking .temporal-screen::before,
+.display.is-thinking .temporal-screen::after {
+  opacity: .72;
+}
+
+.display.is-thinking #temporal-canvas {
+  filter: saturate(1.25) contrast(1.08) brightness(1.04);
+}
+
 #temporal-canvas,
 .ambient-vignette {
   position: absolute;
@@ -154,17 +196,39 @@ button, textarea { font: inherit; }
   left: 50%;
   display: none;
   align-items: center;
-  gap: .55rem;
+  gap: clamp(1rem, 2vw, 1.8rem);
   transform: translate(-50%, -50%);
 }
 
 .listening.is-visible { display: flex; }
-.listening span { width: 7px; height: 7px; border-radius: 50%; background: white; animation: listen 1.4s ease-in-out infinite; }
-.listening span:nth-child(2) { animation-delay: .18s; }
-.listening span:nth-child(3) { animation-delay: .36s; }
+.listening span {
+  width: clamp(22px, 4vw, 54px);
+  height: clamp(22px, 4vw, 54px);
+  border-radius: 50%;
+  background: white;
+  box-shadow:
+    0 0 28px rgba(255,255,255,.88),
+    0 0 80px rgba(255,255,255,.38);
+  animation: listen 0.82s ease-in-out infinite;
+}
+.listening span:nth-child(2) { animation-delay: .12s; }
+.listening span:nth-child(3) { animation-delay: .24s; }
 .listening p { position: absolute; top: 1.4rem; left: 50%; width: 12rem; margin: 0; color: var(--quiet-white); font-family: Georgia, serif; font-size: .75rem; font-style: italic; text-align: center; transform: translateX(-50%); }
-@keyframes listen { 0%, 100% { opacity: .25; transform: scale(.65); } 50% { opacity: 1; transform: scale(1); } }
+@keyframes listen {
+  0%, 100% { opacity: .30; transform: scale(.42); filter: blur(1px); }
+  50% { opacity: 1; transform: scale(1.12); filter: blur(0); }
+}
 @keyframes pulse { 50% { opacity: .25; transform: scale(.65); } }
+
+@keyframes time-rings {
+  from { transform: scale(.75) rotate(0deg); }
+  to { transform: scale(1.18) rotate(24deg); }
+}
+
+@keyframes time-spin {
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(360deg) scale(1.08); }
+}
 
 /* ---------- The separate input/control page ---------- */
 .control {

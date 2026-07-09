@@ -95,12 +95,14 @@
     const response = state[`${selfType}_response`];
 
     if (state.status === "thinking" && !response) {
+      document.body.classList.add("is-thinking");
       voice.hidden = true;
       listening.classList.add("is-visible");
       listening.setAttribute("aria-hidden", "false");
       return;
     }
 
+    document.body.classList.remove("is-thinking");
     voice.hidden = false;
     listening.classList.remove("is-visible");
     listening.setAttribute("aria-hidden", "true");

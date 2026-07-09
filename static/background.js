@@ -522,8 +522,10 @@
     }
 
     if (!reducedMotion) {
-      // This speed is intentionally visible but still calm.
-      time += 0.035;
+      // Calm by default. During thinking, accelerate the whole field so it
+      // feels like the screen is travelling through time.
+      const isThinking = document.body.classList.contains("is-thinking");
+      time += isThinking ? 0.16 : 0.035;
     }
 
     requestAnimationFrame(draw);
