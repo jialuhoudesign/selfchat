@@ -125,15 +125,16 @@ def load_model():
                     os.getenv("SELFCHAT_CPU_THREADS", str(os.cpu_count() or 4))
                 ),
                 "gpu_layers": int(os.getenv("SELFCHAT_GPU_LAYERS", "0")),
-                "temperature": float(os.getenv("SELFCHAT_TEMPERATURE", "0.48")),
+                "temperature": float(os.getenv("SELFCHAT_TEMPERATURE", "0.35")),
                 "top_p": 0.9,
                 "max_tokens": int(os.getenv("SELFCHAT_MAX_TOKENS", "150")),
                 "verbose": False,
                 "system_prompt": (
                     "You write two short voices for an emotional art installation. "
                     "The writing should feel simple, direct, warm, and human. "
-                    "Avoid strange metaphors. Never sound clinical. Do not give "
-                    "medical advice. Follow the requested output format exactly."
+                    "Avoid strange metaphors. Never reveal thinking or analysis. "
+                    "Never sound clinical. Do not give medical advice. Follow the "
+                    "requested output format exactly."
                 ),
             }
             model_path = find_model_path(toolkit_root)
@@ -173,18 +174,28 @@ def generate_local_responses(situation):
 {situation}
 
 Write two different responses in English for an artwork called SelfChat.
-Both voices speak directly to the visitor as "you".
+Both voices are versions of the visitor. They are not friends, therapists,
+teachers, or strangers. They speak as "I" to "you" because they are the same
+person at different times.
+
+Important rules:
+- Do not write any thinking process, analysis, checklist, or explanation.
+- Do not use <think> tags.
+- Do not say "my friend", "dear", "buddy", "pal", or "child".
+- Do not sound like advice from another person.
 
 PAST SELF voice:
 - Sound like a younger version of the visitor.
 - Be innocent, curious, bright, and encouraging.
-- Use plain words, like a child or teenager trying to cheer up their older self.
+- Use plain words, like the visitor's younger self trying to cheer up their older self.
+- You may begin with "I remember..." or "I was you once..."
 - If the visitor made a new choice, say it connects to something they once dreamed about.
 - If the visitor feels sad, remind them of small happy things and simple courage.
 
 FUTURE SELF voice:
 - Sound like an older future version of the visitor.
 - Be calm, grounded, wise, reassuring, and steady.
+- You may begin with "I am still you..." or "I know this moment..."
 - If the visitor feels lost, help them trust one next step.
 - If the visitor feels sad, offer real hope without pretending life is perfect.
 
@@ -196,7 +207,8 @@ your own". Do not copy phrases from these instructions.
 Return exactly two sections. Start with the opening tag <PAST>, immediately
 write the original Past Self response, and close it with </PAST>. Then start
 <FUTURE>, immediately write the original Future Self response, and close it
-with </FUTURE>. Add no introduction, headings, placeholders, or explanation."""
+with </FUTURE>. Add no introduction, headings, placeholders, thinking, or
+explanation. /no_think"""
 
     with _model_lock:
         answer = load_model().ask(prompt)
@@ -296,22 +308,25 @@ def _generate_separately(situation):
 
 Reply as their younger past self, speaking directly to "you". Be innocent,
 curious, bright, encouraging, and gently vulnerable. Use plain words, like a
-child or teenager trying to cheer up their older self. If they are sad, remind
-them of small happy things and simple courage. Write only the response: 2 short
-sentences, under 45 words. Do not add a title, label, or explanation."""
+younger version of the same person trying to cheer up their older self. You may
+begin with "I remember..." or "I was you once..." Do not say "my friend",
+"dear", "buddy", "pal", or "child". Write only the final response: 2 short
+sentences, under 45 words. No title, label, explanation, or thinking. /no_think"""
 
     future_prompt = f"""The visitor says: {situation}
 
 Reply as their future self, speaking directly to "you". Be calm, grounded,
 wise, reassuring, and quietly hopeful. If they are lost, help them trust one
 next step. If they are sad, give reliable confidence without pretending life is
-perfect. Write only the response: 2 short sentences, under 45 words. Do not add
-a title, label, or explanation."""
+perfect. You may begin with "I am still you..." or "I know this moment..." Do
+not say "my friend", "dear", "buddy", "pal", or "child". Write only the final
+response: 2 short sentences, under 45 words. No title, label, explanation, or
+thinking. /no_think"""
 
     with _model_lock:
         model = load_model()
-        past_response = _clean_response(model.ask(past_prompt))
-        future_response = _clean_response(model.ask(future_prompt))
+        past_response = _ask_for_usable_response(model, past_prompt)
+        future_response = _ask_for_usable_response(model, future_prompt)
 
     if not _response_is_usable(past_response) or not _response_is_usable(
         future_response
@@ -320,6 +335,25 @@ a title, label, or explanation."""
             "The local model returned unreadable text; using the safe fallback."
         )
     return past_response, future_response
+
+
+def _ask_for_usable_response(model, prompt):
+    """Ask once, then retry with a stricter prompt if the model exposes thinking."""
+
+    first_answer = _clean_response(model.ask(prompt))
+    if _response_is_usable(first_answer):
+        return first_answer
+
+    retry_prompt = (
+        "FINAL ANSWER ONLY. No thinking. No analysis. No <think>. "
+        "Speak as the same person from another time, not as a friend. "
+        "Avoid my friend, dear, buddy, pal, and child.\n\n"
+        f"{prompt}"
+    )
+    retry_answer = _clean_response(model.ask(retry_prompt))
+    if _response_is_usable(retry_answer):
+        return retry_answer
+    return retry_answer
 
 
 def _response_is_usable(text):
@@ -335,6 +369,22 @@ def _response_is_usable(text):
         return False
 
     lowered = text.lower().strip(" .:;!?")
+    banned_fragments = [
+        "<think",
+        "thinking process",
+        "analyze the request",
+        "**task:**",
+        "**persona:**",
+        "**tone:**",
+        "**format:**",
+        "my friend",
+        "dear",
+        "buddy",
+        " pal",
+    ]
+    if any(fragment in lowered for fragment in banned_fragments):
+        return False
+
     copied_placeholders = {
         "past response here",
         "future response here",
