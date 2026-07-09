@@ -62,6 +62,38 @@ def local_ai_enabled():
     return find_toolkit_root() is not None
 
 
+def find_model_path(toolkit_root):
+    """Find a Pi-friendly GGUF model so users do not need to type exports."""
+
+    if MODEL_ENV:
+        return Path(MODEL_ENV).expanduser()
+
+    app_folder = Path(__file__).resolve().parent
+    model_names = [
+        # User-friendly short name. Rename the preferred model to this on the
+        # Pi if you want SelfChat to choose it automatically.
+        "Qwen3.5.gguf",
+        # This smaller model has been more stable on the Raspberry Pi than the
+        # original 2B model while testing SelfChat.
+        "Qwen3.5-0.8B-Q4_K_M.gguf",
+        # Keep the toolkit's original model as a fallback if it is the only
+        # model available.
+        "Qwen3.5-2B-Q4_K_S.gguf",
+    ]
+    model_folders = [
+        toolkit_root / "models",
+        app_folder.parent / "models",
+        app_folder / "models",
+    ]
+
+    for folder in model_folders:
+        for name in model_names:
+            candidate = folder / name
+            if candidate.is_file():
+                return candidate.resolve()
+    return None
+
+
 def load_model():
     """Load the model once, then reuse it for every visitor."""
 
@@ -93,19 +125,20 @@ def load_model():
                     os.getenv("SELFCHAT_CPU_THREADS", str(os.cpu_count() or 4))
                 ),
                 "gpu_layers": int(os.getenv("SELFCHAT_GPU_LAYERS", "0")),
-                "temperature": float(os.getenv("SELFCHAT_TEMPERATURE", "0.66")),
+                "temperature": float(os.getenv("SELFCHAT_TEMPERATURE", "0.48")),
                 "top_p": 0.9,
-                "max_tokens": int(os.getenv("SELFCHAT_MAX_TOKENS", "190")),
+                "max_tokens": int(os.getenv("SELFCHAT_MAX_TOKENS", "150")),
                 "verbose": False,
                 "system_prompt": (
                     "You write two short voices for an emotional art installation. "
-                    "The writing should feel poetic, simple, intimate, and human. "
-                    "Never sound clinical. Do not give medical advice. Follow the "
-                    "requested output format exactly."
+                    "The writing should feel simple, direct, warm, and human. "
+                    "Avoid strange metaphors. Never sound clinical. Do not give "
+                    "medical advice. Follow the requested output format exactly."
                 ),
             }
-            if MODEL_ENV:
-                settings["model_path"] = str(Path(MODEL_ENV).expanduser())
+            model_path = find_model_path(toolkit_root)
+            if model_path:
+                settings["model_path"] = str(model_path)
 
             candidate = LLM(**settings)
             candidate.load()
@@ -140,24 +173,25 @@ def generate_local_responses(situation):
 {situation}
 
 Write two different responses in English for an artwork called SelfChat.
+Both voices speak directly to the visitor as "you".
 
 PAST SELF voice:
-- Speak like a younger past self inside the visitor.
-- Be innocent, curious, bright, and gently vulnerable.
-- If the visitor made a new choice, encourage them as if this choice touches an old childhood dream.
-- If the visitor feels sad, remind them of small happy things, playfulness, courage, and where they began.
-- Cheer them up without being silly. Sound tender, not wise or adult.
+- Sound like a younger version of the visitor.
+- Be innocent, curious, bright, and encouraging.
+- Use plain words, like a child or teenager trying to cheer up their older self.
+- If the visitor made a new choice, say it connects to something they once dreamed about.
+- If the visitor feels sad, remind them of small happy things and simple courage.
 
 FUTURE SELF voice:
-- Speak like an older future self looking back with calm strength.
-- Be grounded, wise, reassuring, and steady.
-- If the visitor feels lost, help them trust the next small step.
-- If the visitor feels sad, offer reliable hope and quiet confidence.
-- Do not promise that everything is perfect. Give hope that feels real.
+- Sound like an older future version of the visitor.
+- Be calm, grounded, wise, reassuring, and steady.
+- If the visitor feels lost, help them trust one next step.
+- If the visitor feels sad, offer real hope without pretending life is perfect.
 
-Each response must be 2 short sentences and under 55 words. Mention one concrete
-detail from the visitor's situation if possible, but do not repeat the whole
-sentence. Do not copy phrases from these instructions.
+Each response must be 2 short sentences and under 45 words. Mention one concrete
+detail from the visitor's situation if possible. Use natural speech. Avoid vague
+phrases like "the world", "your face", "the corner of your smile", or "make it
+your own". Do not copy phrases from these instructions.
 
 Return exactly two sections. Start with the opening tag <PAST>, immediately
 write the original Past Self response, and close it with </PAST>. Then start
@@ -260,19 +294,19 @@ def _generate_separately(situation):
 
     past_prompt = f"""The visitor says: {situation}
 
-Reply as their younger past self. Be innocent, curious, bright, encouraging,
-and gently vulnerable. If this is a new choice, treat it like it touches an old
-childhood dream. If they are sad, remind them of small happy things and where
-they began. Write only the response: 2 short sentences, under 55 words. Do not
-add a title, label, or explanation."""
+Reply as their younger past self, speaking directly to "you". Be innocent,
+curious, bright, encouraging, and gently vulnerable. Use plain words, like a
+child or teenager trying to cheer up their older self. If they are sad, remind
+them of small happy things and simple courage. Write only the response: 2 short
+sentences, under 45 words. Do not add a title, label, or explanation."""
 
     future_prompt = f"""The visitor says: {situation}
 
-Reply as their future self. Be calm, grounded, wise, reassuring, and quietly
-hopeful. If they are lost, help them trust the next small step. If they are
-sad, give reliable confidence without pretending everything is perfect. Write
-only the response: 2 short sentences, under 55 words. Do not add a title, label,
-or explanation."""
+Reply as their future self, speaking directly to "you". Be calm, grounded,
+wise, reassuring, and quietly hopeful. If they are lost, help them trust one
+next step. If they are sad, give reliable confidence without pretending life is
+perfect. Write only the response: 2 short sentences, under 45 words. Do not add
+a title, label, or explanation."""
 
     with _model_lock:
         model = load_model()
