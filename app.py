@@ -7,6 +7,7 @@ or anywhere else on the internet.
 
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from hashlib import sha256
+import os
 import threading
 import time
 
