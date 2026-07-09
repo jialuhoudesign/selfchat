@@ -130,11 +130,9 @@ def load_model():
                 "max_tokens": int(os.getenv("SELFCHAT_MAX_TOKENS", "150")),
                 "verbose": False,
                 "system_prompt": (
-                    "You write two short voices for an emotional art installation. "
-                    "The writing should feel simple, direct, warm, and human. "
-                    "Avoid strange metaphors. Never reveal thinking or analysis. "
-                    "Never sound clinical. Do not give medical advice. Follow the "
-                    "requested output format exactly."
+                    "Write short, simple, warm replies for SelfChat. "
+                    "Only write the final answer. No thinking, no analysis, "
+                    "no third-person narration, no medical advice."
                 ),
             }
             model_path = find_model_path(toolkit_root)
@@ -169,46 +167,22 @@ def generate_local_responses(situation):
     response straightforward to split without another dependency.
     """
 
-    prompt = f"""A visitor describes their present moment:
+    prompt = f"""Input: {situation}
 
-{situation}
+Write exactly two short replies in this format:
+<PAST>past reply</PAST>
+<FUTURE>future reply</FUTURE>
 
-Write two different responses in English for an artwork called SelfChat.
-Both voices are versions of the visitor. They are not friends, therapists,
-teachers, or strangers. They speak as "I" to "you" because they are the same
-person at different times.
+Past reply: speak as my Past Self; innocent, curious, bright, comforting.
+Future reply: speak as my Future Self; calm, certain, hopeful, reassuring.
 
-Important rules:
-- Do not write any thinking process, analysis, checklist, or explanation.
-- Do not use <think> tags.
+Rules:
+- Final answer only. No thinking.
+- Use only "I" and "you". No third person.
 - Do not say "my friend", "dear", "buddy", "pal", or "child".
-- Do not sound like advice from another person.
-
-PAST SELF voice:
-- Sound like a younger version of the visitor.
-- Be innocent, curious, bright, and encouraging.
-- Use plain words, like the visitor's younger self trying to cheer up their older self.
-- You may begin with "I remember..." or "I was you once..."
-- If the visitor made a new choice, say it connects to something they once dreamed about.
-- If the visitor feels sad, remind them of small happy things and simple courage.
-
-FUTURE SELF voice:
-- Sound like an older future version of the visitor.
-- Be calm, grounded, wise, reassuring, and steady.
-- You may begin with "I am still you..." or "I know this moment..."
-- If the visitor feels lost, help them trust one next step.
-- If the visitor feels sad, offer real hope without pretending life is perfect.
-
-Each response must be 2 short sentences and under 45 words. Mention one concrete
-detail from the visitor's situation if possible. Use natural speech. Avoid vague
-phrases like "the world", "your face", "the corner of your smile", or "make it
-your own". Do not copy phrases from these instructions.
-
-Return exactly two sections. Start with the opening tag <PAST>, immediately
-write the original Past Self response, and close it with </PAST>. Then start
-<FUTURE>, immediately write the original Future Self response, and close it
-with </FUTURE>. Add no introduction, headings, placeholders, thinking, or
-explanation. /no_think"""
+- Do not repeat the input sentence.
+- Each reply: 1 or 2 sentences, under 35 words.
+/no_think"""
 
     with _model_lock:
         answer = load_model().ask(prompt)
@@ -304,24 +278,23 @@ def _valid_pair(past_text, future_text):
 def _generate_separately(situation):
     """Reliable fallback when the combined answer cannot be separated."""
 
-    past_prompt = f"""The visitor says: {situation}
+    past_prompt = f"""Input: {situation}
 
-Reply as their younger past self, speaking directly to "you". Be innocent,
-curious, bright, encouraging, and gently vulnerable. Use plain words, like a
-younger version of the same person trying to cheer up their older self. You may
-begin with "I remember..." or "I was you once..." Do not say "my friend",
-"dear", "buddy", "pal", or "child". Write only the final response: 2 short
-sentences, under 45 words. No title, label, explanation, or thinking. /no_think"""
+You are my Past Self.
+Speak to me as "you".
+Sound innocent, curious, bright, and comforting.
+Answer my feeling directly with encouragement or comfort.
+Use simple words. No third person. No "my friend".
+Final answer only: 1 or 2 sentences, under 35 words. /no_think"""
 
-    future_prompt = f"""The visitor says: {situation}
+    future_prompt = f"""Input: {situation}
 
-Reply as their future self, speaking directly to "you". Be calm, grounded,
-wise, reassuring, and quietly hopeful. If they are lost, help them trust one
-next step. If they are sad, give reliable confidence without pretending life is
-perfect. You may begin with "I am still you..." or "I know this moment..." Do
-not say "my friend", "dear", "buddy", "pal", or "child". Write only the final
-response: 2 short sentences, under 45 words. No title, label, explanation, or
-thinking. /no_think"""
+You are my Future Self.
+Speak to me as "you".
+Sound calm, certain, and hopeful.
+Answer my feeling directly and give me confidence for one next step.
+Use simple words. No third person. No "my friend".
+Final answer only: 1 or 2 sentences, under 35 words. /no_think"""
 
     with _model_lock:
         model = load_model()
@@ -381,8 +354,21 @@ def _response_is_usable(text):
         "dear",
         "buddy",
         " pal",
+        "the visitor",
+        "the person",
+        "new choice",
+        "connects to something",
+        "once dreamed about",
+        "small happy things",
+        "simple courage",
     ]
     if any(fragment in lowered for fragment in banned_fragments):
+        return False
+
+    third_person_pattern = re.compile(
+        r"\b(he|she|they|them|their|visitor|person|someone)\b", re.I
+    )
+    if third_person_pattern.search(text):
         return False
 
     copied_placeholders = {
