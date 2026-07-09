@@ -122,7 +122,7 @@ def load_model():
                 "gpu_layers": int(os.getenv("SELFCHAT_GPU_LAYERS", "0")),
                 "temperature": float(os.getenv("SELFCHAT_TEMPERATURE", "0.35")),
                 "top_p": 0.9,
-                "max_tokens": int(os.getenv("SELFCHAT_MAX_TOKENS", "150")),
+                "max_tokens": int(os.getenv("SELFCHAT_MAX_TOKENS", "80")),
                 "verbose": False,
                 "system_prompt": (
                     "Write short, simple, warm replies for SelfChat. "
@@ -282,7 +282,7 @@ Purpose: cheer me up or encourage me about this exact feeling.
 Use "you" and "we". Do not use third person.
 Do not sound like a therapist, teacher, or friend.
 Do not say: I see you, I hear you, support you, my friend, the world, sun.
-Write only 2 short sentences. /no_think"""
+Write only 1 short sentence. /no_think"""
 
     future_prompt = f"""Present feeling: {situation}
 
@@ -293,7 +293,7 @@ Purpose: reassure me about this exact feeling and give one small next step.
 Use "you" and "we". Do not use third person.
 Do not sound like a therapist, teacher, or friend.
 Do not say: I see you, I hear you, support you, my friend, the world, sun.
-Write only 2 short sentences. /no_think"""
+Write only 1 short sentence. /no_think"""
 
     prompt = past_prompt if voice == "past" else future_prompt
     with _model_lock:

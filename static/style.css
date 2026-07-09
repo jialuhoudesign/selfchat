@@ -144,6 +144,73 @@ button, textarea { font: inherit; }
 @keyframes listen { 0%, 100% { opacity: .25; transform: scale(.65); } 50% { opacity: 1; transform: scale(1); } }
 @keyframes pulse { 50% { opacity: .25; transform: scale(.65); } }
 
+.screen-input {
+  position: absolute;
+  z-index: 5;
+  right: clamp(1.5rem, 4vw, 4rem);
+  bottom: clamp(4.2rem, 8vh, 6.5rem);
+  left: clamp(1.5rem, 4vw, 4rem);
+  max-width: 760px;
+  margin: 0 auto;
+  padding: .95rem;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(4, 5, 9, .36);
+  backdrop-filter: blur(18px);
+  opacity: .34;
+  transition: opacity .25s ease, transform .25s ease, border-color .25s ease;
+}
+
+.screen-input:focus-within,
+.screen-input:hover {
+  border-color: rgba(255,255,255,.42);
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.screen-input__label,
+.screen-input__hint {
+  color: rgba(255,255,255,.45);
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.screen-input__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .7rem;
+  margin: .55rem 0 .35rem;
+}
+
+.screen-input__field {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgba(255,255,255,.24);
+  outline: 0;
+  background: transparent;
+  color: white;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+}
+
+.screen-input__field::placeholder { color: rgba(255,255,255,.26); }
+
+.screen-input__button {
+  border: 1px solid rgba(255,255,255,.26);
+  background: rgba(255,255,255,.08);
+  color: white;
+  cursor: pointer;
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  padding: .62rem .85rem;
+  text-transform: uppercase;
+}
+
+.screen-input__button:disabled { cursor: wait; opacity: .45; }
+.screen-input__hint { margin: .35rem 0 0; opacity: .65; }
+
 /* ---------- The separate input/control page ---------- */
 .control {
   min-height: 100vh;
