@@ -8,20 +8,21 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="control">
+  <nav class="screen-links" aria-label="Open display screens">
+    <a class="screen-link screen-link--future" href="/future" target="_blank">Future</a>
+    <a class="screen-link screen-link--past" href="/past" target="_blank">Past</a>
+  </nav>
+
   <main class="control-panel">
     <h1>How have you been lately?</h1>
 
     <form id="situation-form" class="control-form">
       <label class="visually-hidden" for="situation">Your answer</label>
       <textarea id="situation" name="situation" rows="4" maxlength="600"
-        placeholder="Type here..." required autofocus></textarea>
+        placeholder="type here" required autofocus></textarea>
 
-      <div class="control-form__actions">
-        <button id="submit-button" class="primary-button" type="submit">Send</button>
-        <button id="reset-button" class="text-button" type="button">Reset</button>
-      </div>
-
-      <p class="form-status" id="form-status" aria-live="polite">Ready.</p>
+      <button id="submit-button" class="primary-button visually-hidden" type="submit">Send</button>
+      <p class="form-status" id="form-status" aria-live="polite"></p>
     </form>
   </main>
 

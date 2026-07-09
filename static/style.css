@@ -176,6 +176,39 @@ button, textarea { font: inherit; }
   font-family: Consolas, "Courier New", "SFMono-Regular", Menlo, monospace;
 }
 
+.screen-links {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  pointer-events: none;
+}
+
+.screen-link {
+  position: absolute;
+  top: 50%;
+  padding: .72rem 1rem;
+  border: 1px solid rgba(0, 0, 0, .34);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+  color: rgba(0, 0, 0, .82);
+  font-family: Consolas, "Courier New", "SFMono-Regular", Menlo, monospace;
+  font-size: .78rem;
+  letter-spacing: .04em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  backdrop-filter: blur(6px);
+}
+
+.screen-link:hover {
+  background: rgba(0, 0, 0, .82);
+  color: #f5f2eb;
+}
+
+.screen-link--future { left: clamp(1rem, 3vw, 2.2rem); }
+.screen-link--past { right: clamp(1rem, 3vw, 2.2rem); }
+
 .control-panel {
   width: min(86vw, 760px);
   min-height: 100vh;
@@ -201,35 +234,37 @@ button, textarea { font: inherit; }
 
 .control-form {
   width: min(100%, 620px);
-  padding: clamp(1rem, 3vw, 1.7rem);
-  border: 1px solid rgba(0, 0, 0, .26);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, .22);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, .12);
-  backdrop-filter: blur(10px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .control-form textarea {
   width: 100%;
-  min-height: clamp(9rem, 28vh, 15rem);
-  padding: 1.2rem;
-  resize: vertical;
-  border: 1px solid rgba(0, 0, 0, .28);
-  border-radius: 12px;
+  min-height: clamp(7rem, 24vh, 13rem);
+  padding: 0;
+  resize: none;
+  border: 0;
+  border-radius: 0;
   outline: 0;
-  background: rgba(255, 255, 255, .18);
+  background: transparent;
   color: #050505;
+  caret-color: #050505;
   font-family: Consolas, "Courier New", "SFMono-Regular", Menlo, monospace;
-  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-size: clamp(1.35rem, 3.2vw, 2.5rem);
   line-height: 1.55;
+  text-align: center;
 }
 
 .control-form textarea:focus {
-  border-color: rgba(0, 0, 0, .72);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, .07);
+  box-shadow: none;
 }
 
-.control-form textarea::placeholder { color: rgba(0, 0, 0, .42); }
+.control-form textarea::placeholder {
+  color: rgba(0, 0, 0, .38);
+  text-align: center;
+}
 
 .control-form__actions {
   display: flex;
@@ -268,8 +303,9 @@ button, textarea { font: inherit; }
 .form-status {
   min-height: 1.2em;
   margin: .9rem 0 0;
-  color: rgba(0, 0, 0, .58);
+  color: rgba(0, 0, 0, .45);
   font-size: .78rem;
+  text-transform: lowercase;
 }
 
 .screen-guide { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 3rem; }
@@ -283,7 +319,12 @@ button, textarea { font: inherit; }
   .voice { width: 86vw; }
   .voice__message { font-size: clamp(2.4rem, 13vw, 4rem); }
   .screen-guide { grid-template-columns: 1fr; }
-  .control-form__actions { align-items: flex-start; flex-direction: column; }
+  .control-form__actions { align-items: center; flex-direction: column; }
+  .screen-link {
+    top: auto;
+    bottom: 1rem;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

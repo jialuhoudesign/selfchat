@@ -12,13 +12,21 @@
     const resetButton = document.getElementById("reset-button");
     const status = document.getElementById("form-status");
 
+    // Press Enter to send. Use Shift+Enter only if you really want a new line.
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+    });
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const situation = input.value.trim();
       if (!situation) return input.focus();
 
       submitButton.disabled = true;
-      status.textContent = "Sending your words across time…";
+      status.textContent = "sending";
 
       try {
         const response = await fetch("/respond", {
@@ -28,36 +36,35 @@
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "The screens did not respond.");
-        if (data.response_source === "local") {
-          status.textContent = "The local AI has answered on both screens.";
-        } else if (data.response_source === "mock-timeout") {
-          status.textContent = "The local AI was too slow, so SelfChat used the instant exhibition response.";
-        } else if (data.response_source === "mock-fallback") {
-          status.textContent = "The local AI was unavailable, so the safe backup answered.";
-        } else {
-          status.textContent = "Sent. Both screens have received the mock responses.";
-        }
+
+        // After the words are sent, the input disappears again.
+        input.value = "";
+        status.textContent = "sent";
       } catch (error) {
         status.textContent = error.message;
       } finally {
         submitButton.disabled = false;
+        input.focus();
       }
     });
 
-    resetButton.addEventListener("click", async () => {
-      resetButton.disabled = true;
-      status.textContent = "Resetting both screens…";
-      try {
-        await fetch("/reset", { method: "POST" });
-        input.value = "";
-        status.textContent = "Both screens are ready for a new visitor.";
-        input.focus();
-      } catch (error) {
-        status.textContent = "Could not reset the screens.";
-      } finally {
-        resetButton.disabled = false;
-      }
-    });
+    // Kept optional so older pages with a reset button still work.
+    if (resetButton) {
+      resetButton.addEventListener("click", async () => {
+        resetButton.disabled = true;
+        status.textContent = "resetting";
+        try {
+          await fetch("/reset", { method: "POST" });
+          input.value = "";
+          status.textContent = "";
+          input.focus();
+        } catch (error) {
+          status.textContent = "Could not reset the screens.";
+        } finally {
+          resetButton.disabled = false;
+        }
+      });
+    }
     return;
   }
 
