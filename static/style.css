@@ -21,7 +21,7 @@ button, textarea { font: inherit; }
 /* ---------- The two physical display pages ---------- */
 .display { height: 100%; overflow: hidden; }
 .display--future { background: #b8ccd9; }
-.display--past { background: #f4c986; }
+.display--past { background: #ffe1a4; }
 
 .temporal-screen {
   position: relative;
@@ -54,9 +54,13 @@ button, textarea { font: inherit; }
 
 .display--past .ambient-vignette {
   background:
-    radial-gradient(circle at 50% 48%, rgba(88, 70, 42, .16) 0%, rgba(88, 70, 42, .08) 32%, rgba(38, 30, 24, .30) 95%),
-    linear-gradient(115deg, rgba(255, 246, 220, .18), transparent 38%),
-    linear-gradient(245deg, rgba(255, 132, 63, .10), transparent 50%);
+    radial-gradient(circle at 50% 48%, rgba(70, 45, 25, .14) 0%, transparent 34%, rgba(96, 58, 28, .16) 96%),
+    linear-gradient(115deg, rgba(255, 255, 245, .16), transparent 38%),
+    linear-gradient(245deg, rgba(255, 132, 63, .08), transparent 50%);
+}
+
+.display--past .voice__message {
+  text-shadow: 0 4px 36px rgba(72, 44, 20, .58), 0 1px 5px rgba(72, 44, 20, .36);
 }
 
 .screen-label,

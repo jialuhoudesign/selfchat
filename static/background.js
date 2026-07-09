@@ -25,9 +25,9 @@
 
   const pastColors = [
     [255, 214, 76],  // soft yellow
-    [255, 126, 54],  // orange
-    [255, 157, 142], // peach pink
-    [116, 172, 166], // faded blue-green
+    [255, 139, 43],  // orange
+    [255, 183, 119], // peach
+    [142, 185, 177], // faded blue-green
   ];
 
   const futureColors = [
@@ -73,10 +73,10 @@
       gradient.addColorStop(0.48, "#9eb9cc");
       gradient.addColorStop(1, "#476274");
     } else {
-      gradient.addColorStop(0, "#fff6dc");
-      gradient.addColorStop(0.35, "#ffe7ba");
-      gradient.addColorStop(0.72, "#f7c785");
-      gradient.addColorStop(1, "#9ab9aa");
+      gradient.addColorStop(0, "#fff9ea");
+      gradient.addColorStop(0.38, "#ffe8c8");
+      gradient.addColorStop(0.72, "#ffd38f");
+      gradient.addColorStop(1, "#f7b66c");
     }
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
@@ -89,8 +89,8 @@
     const radius = blob.baseRadius * pulse;
 
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, rgba(blob.color, 0.22));
-    gradient.addColorStop(0.45, rgba(blob.color, 0.12));
+    gradient.addColorStop(0, rgba(blob.color, 0.34));
+    gradient.addColorStop(0.45, rgba(blob.color, 0.17));
     gradient.addColorStop(1, rgba(blob.color, 0));
 
     ctx.fillStyle = gradient;
@@ -100,7 +100,7 @@
 
     // A smaller moving core makes the motion easier to see on a screen.
     if (index % 2 === 0) {
-      ctx.fillStyle = rgba(blob.color, 0.08);
+      ctx.fillStyle = rgba(blob.color, 0.12);
       ctx.beginPath();
       ctx.arc(x, y, radius * 0.22, 0, Math.PI * 2);
       ctx.fill();
@@ -378,26 +378,102 @@
     if (isFuture) return;
 
     ctx.save();
-    ctx.globalCompositeOperation = "multiply";
+    ctx.globalCompositeOperation = "source-over";
     blobs.forEach(drawBlob);
     ctx.restore();
 
     ctx.save();
     ctx.globalCompositeOperation = "source-over";
-    drawPastFlower(width * 0.33, height * 0.42, Math.min(width, height) / 720, 0.1, [255, 118, 72], [93, 150, 158]);
-    drawPastFlower(width * 0.64, height * 0.36, Math.min(width, height) / 820, 1.8, [255, 183, 72], [96, 155, 132]);
-    drawPastFlower(width * 0.50, height * 0.68, Math.min(width, height) / 900, 3.2, [255, 210, 88], [86, 139, 132]);
+    drawPastFlower(width * 0.33, height * 0.42, Math.min(width, height) / 720, 0.1, [255, 118, 54], [128, 177, 172]);
+    drawPastFlower(width * 0.64, height * 0.36, Math.min(width, height) / 820, 1.8, [255, 205, 62], [139, 188, 151]);
+    drawPastFlower(width * 0.50, height * 0.68, Math.min(width, height) / 900, 3.2, [255, 151, 57], [123, 175, 169]);
     ctx.restore();
 
     // Fine moving film grain, kept sparse for Pi performance.
     ctx.save();
-    ctx.globalAlpha = 0.12;
-    ctx.fillStyle = "#7d6a3d";
+    ctx.globalAlpha = 0.10;
     for (let i = 0; i < 180; i += 1) {
       const x = (Math.sin(i * 17.13 + time * 0.7) * 0.5 + 0.5) * width;
       const y = (Math.cos(i * 23.71 + time * 0.5) * 0.5 + 0.5) * height;
+      ctx.fillStyle = i % 3 === 0
+        ? "rgba(255, 168, 64, .45)"
+        : i % 3 === 1
+          ? "rgba(255, 220, 90, .35)"
+          : "rgba(114, 168, 158, .22)";
       ctx.fillRect(x, y, 1, 1);
     }
+    ctx.restore();
+  }
+
+  function drawPastFloatingOrbs() {
+    if (isFuture) return;
+
+    const orbColors = [
+      [255, 207, 67],
+      [255, 139, 55],
+      [255, 177, 121],
+      [132, 188, 175],
+    ];
+
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+
+    for (let i = 0; i < 12; i += 1) {
+      const color = orbColors[i % orbColors.length];
+      const baseX = ((i * 137) % 1000) / 1000 * width;
+      const baseY = ((i * 263) % 1000) / 1000 * height;
+      const x = baseX + Math.sin(time * 0.7 + i * 1.7) * width * 0.035;
+      const y = baseY + Math.cos(time * 0.55 + i * 1.1) * height * 0.035;
+      const radius = Math.min(width, height) * (0.018 + (i % 4) * 0.006);
+
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, radius * 4);
+      glow.addColorStop(0, rgba(color, 0.22));
+      glow.addColorStop(0.35, rgba(color, 0.10));
+      glow.addColorStop(1, rgba(color, 0));
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, radius * 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = rgba(color, 0.18);
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawPastFlowCurves() {
+    if (isFuture) return;
+
+    ctx.save();
+    ctx.lineCap = "round";
+
+    for (let row = 0; row < 4; row += 1) {
+      ctx.beginPath();
+      const baseY = height * (0.18 + row * 0.19);
+      const amplitude = height * (0.055 + row * 0.008);
+
+      for (let step = 0; step <= 90; step += 1) {
+        const p = step / 90;
+        const x = p * width;
+        const y =
+          baseY +
+          Math.sin(p * Math.PI * 2.1 + time * 0.9 + row) * amplitude +
+          Math.sin(p * Math.PI * 4.6 - time * 0.45) * amplitude * 0.33;
+
+        if (step === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.strokeStyle = row % 2
+        ? "rgba(255, 142, 58, 0.22)"
+        : "rgba(255, 214, 76, 0.26)";
+      ctx.lineWidth = row % 2 ? 3 : 7;
+      ctx.stroke();
+    }
+
     ctx.restore();
   }
 
@@ -411,6 +487,8 @@
       drawFutureScanner();
     } else {
       drawPastFloralMemory();
+      drawPastFlowCurves();
+      drawPastFloatingOrbs();
     }
 
     if (!reducedMotion) {
