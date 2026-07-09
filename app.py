@@ -24,6 +24,7 @@ from local_ai import (
 
 app = Flask(__name__)
 AI_TIMEOUT_SECONDS = 20
+MIN_THINKING_SECONDS = 2.4
 ai_executor = ThreadPoolExecutor(max_workers=1)
 ai_busy_lock = threading.Lock()
 
@@ -362,6 +363,8 @@ def respond():
 
     # Keep extremely long accidental input from overwhelming the display.
     situation = situation[:600]
+    generation_started_at = time.monotonic()
+
     # Tell both artwork screens that generation has started. They keep polling
     # /state while the Pi works on the local model response.
     installation_state.update(
@@ -412,6 +415,12 @@ def respond():
     else:
         past_response, future_response = create_mock_responses(situation)
 
+    # Mock and fallback responses can be instant. Keep the thinking state alive
+    # long enough for the display screens to visibly enter the time-travel mode.
+    elapsed = time.monotonic() - generation_started_at
+    if response_source != "local" and elapsed < MIN_THINKING_SECONDS:
+        time.sleep(MIN_THINKING_SECONDS - elapsed)
+
     # Updating one shared object lets the two screens change together when
     # their small polling requests next reach /state.
     installation_state.update(
@@ -452,4 +461,4 @@ if __name__ == "__main__":
     # host="0.0.0.0" also lets another device on the same local network open
     # the installation.  debug is intentionally off for exhibition stability.
     port = int(os.environ.get("SELFCHAT_PORT", "5001"))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
