@@ -71,12 +71,9 @@ def find_model_path(toolkit_root):
     app_folder = Path(__file__).resolve().parent
     model_names = [
         # Prefer the larger 2B model for better language quality.
-        "Qwen3.5-2B-Q4_K_S.gguf",
-        # User-friendly short name, used as a fallback if the 2B file is not
-        # present on the Pi.
+        "Qwen3.5-2B.gguf",
+        # Smaller/local fallback model.
         "Qwen3.5.gguf",
-        # Original smaller filename, kept as another fallback.
-        "Qwen3.5-0.8B-Q4_K_M.gguf",
     ]
     model_folders = [
         toolkit_root / "models",
@@ -251,27 +248,27 @@ def _valid_pair(past_text, future_text):
 def _generate_separately(situation):
     """Reliable fallback when the combined answer cannot be separated."""
 
-    past_prompt = f"""Present me says: {situation}
+    past_prompt = f"""Present feeling: {situation}
 
-Roleplay as my younger Past Self.
-You are me when I was younger, innocent, curious, and hopeful.
-Start with a curious, young voice, such as "Hey," or "What if".
-Speak to present me with "you" and "we".
-Encourage me about this feeling in a small, bright, childlike way.
+You are my younger self from childhood.
+Talk to me like we are the same person.
+Voice: curious, simple, bright, a little playful, gentle.
+Purpose: cheer me up or encourage me about this exact feeling.
+Use "you" and "we". Do not use third person.
+Do not sound like a therapist, teacher, or friend.
 Do not say: I see you, I hear you, support you, my friend, the world, sun.
-Do not repeat my exact words. No third person.
-Final answer only: 2 short sentences. /no_think"""
+Write only 2 short sentences. /no_think"""
 
-    future_prompt = f"""Present me says: {situation}
+    future_prompt = f"""Present feeling: {situation}
 
-Roleplay as my older Future Self.
-You are me in the future, mature, wise, calm, and hopeful.
-Start exactly with: I have lived past this
-Speak to present me with "you" and "we".
-Give me steady hope and one small next step.
+You are my older future self.
+Talk to me like we are the same person.
+Voice: calm, mature, wise, steady, hopeful.
+Purpose: reassure me about this exact feeling and give one small next step.
+Use "you" and "we". Do not use third person.
+Do not sound like a therapist, teacher, or friend.
 Do not say: I see you, I hear you, support you, my friend, the world, sun.
-Do not repeat my exact words. No third person.
-Final answer only: 2 short sentences. /no_think"""
+Write only 2 short sentences. /no_think"""
 
     with _model_lock:
         model = load_model()
@@ -281,9 +278,7 @@ Final answer only: 2 short sentences. /no_think"""
     if not _response_is_usable(past_response) or not _response_is_usable(
         future_response
     ):
-        raise RuntimeError(
-            "The local model returned unreadable text; using the safe fallback."
-        )
+        return _safe_template_responses(situation)
     return past_response, future_response
 
 
@@ -304,6 +299,26 @@ def _ask_for_usable_response(model, prompt):
     if _response_is_usable(retry_answer):
         return retry_answer
     return retry_answer
+
+
+def _safe_template_responses(situation):
+    """Readable fallback when the small local model becomes too generic."""
+
+    lowered = situation.lower()
+    if any(word in lowered for word in ["sad", "upset", "lonely", "cry"]):
+        return (
+            "Hey, maybe today is heavy, but we can still find one tiny bright thing. You do not have to be brave all at once.",
+            "You can be sad and still be moving forward. Take one small breath, then one small step; we are not finished yet.",
+        )
+    if any(word in lowered for word in ["phd", "study", "school", "start", "new"]):
+        return (
+            "What if this is the adventure we used to imagine before we knew its name? You are allowed to be nervous and still begin.",
+            "This beginning does not need to feel easy to be right. Take the next page, the next note, the next hour; we will grow into it.",
+        )
+    return (
+        "Hey, we do not need to understand everything right now. Let us stay curious and hold this moment gently.",
+        "You are not stuck here forever. Choose one small honest step, and let that be enough for now.",
+    )
 
 
 def _response_is_usable(text):
