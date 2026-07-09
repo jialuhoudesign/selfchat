@@ -124,6 +124,11 @@ button, textarea { font: inherit; }
   letter-spacing: .02em;
 }
 
+.voice__intro:empty,
+.voice__caption:empty {
+  display: none;
+}
+
 .voice.is-changing { animation: message-arrives 1.25s cubic-bezier(.2,.75,.2,1) both; }
 
 @keyframes message-arrives {

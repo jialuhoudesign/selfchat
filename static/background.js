@@ -384,9 +384,9 @@
 
     ctx.save();
     ctx.globalCompositeOperation = "source-over";
-    drawPastFlower(width * 0.30, height * 0.42, Math.min(width, height) / 650, 0.1, [255, 92, 28], [147, 205, 126]);
-    drawPastFlower(width * 0.65, height * 0.36, Math.min(width, height) / 720, 1.8, [255, 209, 32], [151, 208, 136]);
-    drawPastFlower(width * 0.50, height * 0.70, Math.min(width, height) / 760, 3.2, [255, 135, 22], [126, 196, 151]);
+    drawPastFlower(width * 0.30, height * 0.42, Math.min(width, height) / 650, 0.1, [255, 92, 28], [166, 216, 92]);
+    drawPastFlower(width * 0.65, height * 0.36, Math.min(width, height) / 720, 1.8, [255, 209, 32], [181, 224, 100]);
+    drawPastFlower(width * 0.50, height * 0.70, Math.min(width, height) / 760, 3.2, [255, 135, 22], [149, 210, 88]);
     ctx.restore();
 
     // Fine moving film grain, kept sparse for Pi performance.
@@ -399,7 +399,7 @@
         ? "rgba(255, 168, 64, .45)"
         : i % 3 === 1
           ? "rgba(255, 220, 90, .35)"
-          : "rgba(114, 168, 158, .22)";
+          : "rgba(166, 205, 92, .24)";
       ctx.fillRect(x, y, 1, 1);
     }
     ctx.restore();
@@ -412,7 +412,7 @@
       [255, 207, 67],
       [255, 139, 55],
       [255, 177, 121],
-      [132, 188, 175],
+      [168, 216, 94],
     ];
 
     ctx.save();

@@ -73,14 +73,14 @@
 
   const opening = {
     past: {
-      intro: "Hi, I am you in the Past.",
-      message: "How have you been lately?",
-      caption: "I still remember where we began.",
+      intro: "",
+      message: "I am Past Yourself.",
+      caption: "",
     },
     future: {
-      intro: "Hi, I am you in the Future.",
-      message: "How have you been lately?",
-      caption: "I can see where this is leading.",
+      intro: "",
+      message: "I am Future Yourself.",
+      caption: "",
     },
   };
 
@@ -98,9 +98,9 @@
     listening.classList.remove("is-visible");
     listening.setAttribute("aria-hidden", "true");
     const text = response ? {
-      intro: selfType === "past" ? "I remember this feeling." : "I remember you here.",
+      intro: "",
       message: response,
-      caption: selfType === "past" ? "— Yourself, from before" : "— Yourself, from ahead",
+      caption: "",
     } : opening[selfType];
 
     voice.classList.remove("is-changing");

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#05060a">
-  <title>{{ self_type|capitalize }} Self — SelfChat</title>
+  <title>{{ self_type|capitalize }} Self - SelfChat</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="display display--{{ self_type }}" data-self-type="{{ self_type }}">
@@ -13,30 +13,17 @@
     <canvas id="temporal-canvas" aria-hidden="true"></canvas>
     <div class="ambient-vignette" aria-hidden="true"></div>
 
-    <header class="screen-label">
-      <span class="screen-label__line"></span>
-      <span>SelfChat / {{ "Before" if self_type == "past" else "Ahead" }}</span>
-    </header>
-
     <section class="voice" aria-live="polite">
-      <p class="voice__intro" id="voice-intro">
-        Hi, I am you in the {{ self_type|capitalize }}.
-      </p>
-      <h1 class="voice__message" id="voice-message">How have you been lately?</h1>
-      <p class="voice__caption" id="voice-caption">
-        {{ "I still remember where we began." if self_type == "past" else "I can see where this is leading." }}
-      </p>
+      <p class="voice__intro" id="voice-intro"></p>
+      <h1 class="voice__message" id="voice-message">
+        {{ "I am Past Yourself." if self_type == "past" else "I am Future Yourself." }}
+      </h1>
+      <p class="voice__caption" id="voice-caption"></p>
     </section>
 
     <div class="listening" id="listening" aria-hidden="true">
       <span></span><span></span><span></span>
-      <p>Listening across time</p>
     </div>
-
-    <footer class="screen-footer">
-      <span>{{ "Memory / 01" if self_type == "past" else "Possibility / 02" }}</span>
-      <span class="screen-footer__dot"></span>
-    </footer>
   </main>
 
   <script src="{{ url_for('static', filename='background.js') }}"></script>
