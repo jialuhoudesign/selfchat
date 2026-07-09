@@ -4,8 +4,8 @@
  * This is not a heavy fluid simulation. It is a small, stable illusion:
  * slow moving translucent blobs + animated wave lines.
  *
- * Past   = bright green/yellow gradient poster motion.
- * Future = cool blue/purple sci-fi gradient motion.
+ * Past   = warm green/yellow/orange gradient poster motion.
+ * Future = cold blue-grey sci-fi poster motion with dark moving forms.
  */
 (function () {
   "use strict";
@@ -24,17 +24,17 @@
   let blobs = [];
 
   const pastColors = [
-    [190, 255, 123], // yellow green
-    [111, 244, 165], // mint
-    [66, 111, 224],  // deep blue
-    [234, 255, 111], // lemon
+    [244, 255, 116], // lemon
+    [185, 245, 92],  // yellow green
+    [255, 178, 78],  // orange
+    [108, 218, 132], // natural green
   ];
 
   const futureColors = [
-    [61, 150, 255],
-    [121, 75, 255],
-    [45, 230, 221],
-    [205, 93, 255],
+    [10, 35, 52],    // deep ink blue
+    [18, 52, 73],    // cold shadow
+    [37, 76, 96],    // blue grey
+    [7, 18, 28],     // near black
   ];
 
   function resize() {
@@ -69,14 +69,14 @@
   function drawBase() {
     const gradient = ctx.createLinearGradient(0, 0, width, height);
     if (isFuture) {
-      gradient.addColorStop(0, "#111e5b");
-      gradient.addColorStop(0.5, "#432a9b");
-      gradient.addColorStop(1, "#0f082d");
+      gradient.addColorStop(0, "#dbe8f4");
+      gradient.addColorStop(0.46, "#a9c5d9");
+      gradient.addColorStop(1, "#5e7d95");
     } else {
-      gradient.addColorStop(0, "#caffc7");
-      gradient.addColorStop(0.32, "#a7f577");
-      gradient.addColorStop(0.68, "#6fe7b3");
-      gradient.addColorStop(1, "#2a66d6");
+      gradient.addColorStop(0, "#fff0a6");
+      gradient.addColorStop(0.32, "#d7f36a");
+      gradient.addColorStop(0.68, "#8ee47e");
+      gradient.addColorStop(1, "#f2a64b");
     }
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
@@ -89,8 +89,8 @@
     const radius = blob.baseRadius * pulse;
 
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, rgba(blob.color, isFuture ? 0.34 : 0.44));
-    gradient.addColorStop(0.45, rgba(blob.color, isFuture ? 0.12 : 0.22));
+    gradient.addColorStop(0, rgba(blob.color, isFuture ? 0.48 : 0.44));
+    gradient.addColorStop(0.45, rgba(blob.color, isFuture ? 0.26 : 0.22));
     gradient.addColorStop(1, rgba(blob.color, 0));
 
     ctx.fillStyle = gradient;
@@ -100,7 +100,7 @@
 
     // A smaller moving core makes the motion easier to see on a screen.
     if (index % 2 === 0) {
-      ctx.fillStyle = rgba(blob.color, isFuture ? 0.16 : 0.18);
+      ctx.fillStyle = rgba(blob.color, isFuture ? 0.2 : 0.18);
       ctx.beginPath();
       ctx.arc(x, y, radius * 0.22, 0, Math.PI * 2);
       ctx.fill();
@@ -128,13 +128,13 @@
 
     if (isFuture) {
       ctx.strokeStyle = row % 2
-        ? "rgba(139, 92, 255, 0.35)"
-        : "rgba(67, 214, 255, 0.32)";
-      ctx.lineWidth = 1.4;
+        ? "rgba(170, 31, 62, 0.38)"
+        : "rgba(45, 80, 100, 0.18)";
+      ctx.lineWidth = row % 2 ? 1 : 7;
     } else {
       ctx.strokeStyle = row % 2
-        ? "rgba(255, 255, 255, 0.42)"
-        : "rgba(37, 80, 190, 0.22)";
+        ? "rgba(255, 135, 54, 0.42)"
+        : "rgba(111, 180, 60, 0.25)";
       ctx.lineWidth = row % 2 ? 2 : 8;
       ctx.lineCap = "round";
     }
@@ -145,18 +145,51 @@
     if (!isFuture) return;
 
     ctx.save();
-    ctx.globalAlpha = 0.14;
-    ctx.strokeStyle = "rgba(94, 159, 255, 0.25)";
+    ctx.globalAlpha = 0.45;
+    ctx.strokeStyle = "rgba(150, 20, 48, 0.42)";
     ctx.lineWidth = 1;
 
-    const spacing = 110;
-    const offset = (time * 42) % spacing;
-    for (let x = -spacing; x < width + spacing; x += spacing) {
+    const spacing = 170;
+    const offset = (time * 24) % spacing;
+    for (let x = -spacing; x < width + spacing; x += spacing * 1.4) {
       ctx.beginPath();
-      ctx.moveTo(x + offset, 0);
-      ctx.lineTo(x + offset + width * 0.08, height);
+      ctx.moveTo(x + offset, height * 0.08);
+      ctx.lineTo(x + offset + width * 0.28, height * 0.86);
       ctx.stroke();
     }
+    ctx.restore();
+  }
+
+  function drawFuturePosterMarks() {
+    if (!isFuture) return;
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(150, 20, 48, 0.62)";
+    ctx.fillStyle = "rgba(210, 15, 25, 0.85)";
+    ctx.lineWidth = 1.2;
+
+    const points = [
+      [width * 0.18, height * 0.24],
+      [width * 0.74, height * 0.18],
+      [width * 0.36, height * 0.62],
+      [width * 0.82, height * 0.70],
+    ];
+
+    points.forEach(([x, y], index) => {
+      const ox = Math.sin(time * 0.8 + index) * 10;
+      const oy = Math.cos(time * 0.6 + index) * 8;
+      ctx.beginPath();
+      ctx.moveTo(x + ox, y + oy);
+      ctx.lineTo(width * (0.48 + index * 0.07), height * (0.42 + index * 0.08));
+      ctx.stroke();
+    });
+
+    ctx.fillRect(width * 0.14, height * 0.30, 22, 22);
+    ctx.beginPath();
+    ctx.moveTo(width * 0.12, height * 0.10);
+    ctx.lineTo(width * 0.78, height * 0.10);
+    ctx.stroke();
+
     ctx.restore();
   }
 
@@ -164,7 +197,7 @@
     if (isFuture) return;
 
     ctx.save();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.42)";
+    ctx.strokeStyle = "rgba(255, 150, 55, 0.46)";
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let step = 0; step <= 80; step += 1) {
@@ -180,7 +213,7 @@
     ctx.stroke();
 
     ctx.setLineDash([2, 8]);
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.strokeStyle = "rgba(117, 160, 56, 0.28)";
     ctx.lineWidth = 1;
     for (let row = 0; row < 3; row += 1) {
       ctx.beginPath();
@@ -208,6 +241,7 @@
     ctx.restore();
 
     drawFutureScanLines();
+    drawFuturePosterMarks();
     drawPastPosterDetails();
 
     if (!reducedMotion) {

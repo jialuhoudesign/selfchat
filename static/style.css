@@ -20,8 +20,8 @@ button, textarea { font: inherit; }
 
 /* ---------- The two physical display pages ---------- */
 .display { height: 100%; overflow: hidden; }
-.display--future { background: #07103a; }
-.display--past { background: #a7f577; }
+.display--future { background: #b8ccd9; }
+.display--past { background: #d7f36a; }
 
 .temporal-screen {
   position: relative;
@@ -47,16 +47,16 @@ button, textarea { font: inherit; }
 
 .display--future .ambient-vignette {
   background:
-    radial-gradient(circle at 50% 45%, rgba(32, 60, 160, 0.02) 8%, rgba(3, 5, 20, 0.48) 88%),
-    linear-gradient(115deg, rgba(38, 111, 255, .12), transparent 42%),
-    linear-gradient(245deg, rgba(156, 70, 255, .12), transparent 46%);
+    radial-gradient(circle at 50% 48%, transparent 20%, rgba(12, 28, 42, 0.28) 92%),
+    linear-gradient(180deg, rgba(255,255,255,.22), transparent 35%),
+    linear-gradient(0deg, rgba(0, 18, 30, .26), transparent 42%);
 }
 
 .display--past .ambient-vignette {
   background:
-    radial-gradient(circle at 50% 52%, transparent 10%, rgba(0, 30, 80, 0.12) 82%),
-    linear-gradient(115deg, rgba(255,255,255,.18), transparent 38%),
-    linear-gradient(245deg, rgba(37, 90, 210, .10), transparent 50%);
+    radial-gradient(circle at 50% 52%, transparent 10%, rgba(94, 116, 18, 0.13) 84%),
+    linear-gradient(115deg, rgba(255, 222, 96, .22), transparent 38%),
+    linear-gradient(245deg, rgba(255, 143, 49, .13), transparent 50%);
 }
 
 .screen-label,
