@@ -30,6 +30,8 @@
         if (!response.ok) throw new Error(data.error || "The screens did not respond.");
         if (data.response_source === "local") {
           status.textContent = "The local AI has answered on both screens.";
+        } else if (data.response_source === "mock-timeout") {
+          status.textContent = "The local AI was too slow, so SelfChat used the instant exhibition response.";
         } else if (data.response_source === "mock-fallback") {
           status.textContent = "The local AI was unavailable, so the safe backup answered.";
         } else {
@@ -67,8 +69,6 @@
   const message = document.getElementById("voice-message");
   const caption = document.getElementById("voice-caption");
   const listening = document.getElementById("listening");
-  const screenInputForm = document.getElementById("screen-input-form");
-  const screenInput = document.getElementById("screen-situation");
   let lastVersion = -1;
 
   const opening = {
@@ -109,41 +109,6 @@
     caption.textContent = text.caption;
     void voice.offsetWidth;
     voice.classList.add("is-changing");
-  }
-
-  if (screenInputForm && screenInput) {
-    screenInputForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const situation = screenInput.value.trim();
-      if (!situation) return screenInput.focus();
-
-      const button = screenInputForm.querySelector("button");
-      if (button) button.disabled = true;
-
-      try {
-        await fetch("/respond", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ situation }),
-        });
-        screenInput.value = "";
-        screenInput.blur();
-      } catch (error) {
-        screenInput.focus();
-      } finally {
-        if (button) button.disabled = false;
-      }
-    });
-
-    window.addEventListener("keydown", (event) => {
-      if (event.key === "/" && document.activeElement !== screenInput) {
-        event.preventDefault();
-        screenInput.focus();
-      }
-      if (event.key === "Escape" && document.activeElement === screenInput) {
-        screenInput.blur();
-      }
-    });
   }
 
   async function updateFromServer() {

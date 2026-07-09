@@ -33,24 +33,6 @@
       <p>Listening across time</p>
     </div>
 
-    <form class="screen-input" id="screen-input-form" autocomplete="off">
-      <label class="screen-input__label" for="screen-situation">
-        Type here, then press Enter
-      </label>
-      <div class="screen-input__row">
-        <input
-          id="screen-situation"
-          class="screen-input__field"
-          name="situation"
-          type="text"
-          placeholder="How are you feeling now?"
-          maxlength="240"
-        >
-        <button class="screen-input__button" type="submit">Send</button>
-      </div>
-      <p class="screen-input__hint">Press / to focus · Esc to hide</p>
-    </form>
-
     <footer class="screen-footer">
       <span>{{ "Memory / 01" if self_type == "past" else "Possibility / 02" }}</span>
       <span class="screen-footer__dot"></span>
