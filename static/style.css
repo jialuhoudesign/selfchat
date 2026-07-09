@@ -20,8 +20,8 @@ button, textarea { font: inherit; }
 
 /* ---------- The two physical display pages ---------- */
 .display { height: 100%; overflow: hidden; }
-.display--future { background: #030718; }
-.display--past { background: #180908; }
+.display--future { background: #07103a; }
+.display--past { background: #a7f577; }
 
 .temporal-screen {
   position: relative;
@@ -54,9 +54,9 @@ button, textarea { font: inherit; }
 
 .display--past .ambient-vignette {
   background:
-    radial-gradient(circle at 50% 46%, rgba(255, 154, 78, 0.035) 5%, rgba(18, 8, 7, 0.50) 88%),
-    linear-gradient(115deg, rgba(255, 126, 75, .12), transparent 45%),
-    linear-gradient(245deg, rgba(255, 198, 110, .08), transparent 48%);
+    radial-gradient(circle at 50% 52%, transparent 10%, rgba(0, 30, 80, 0.12) 82%),
+    linear-gradient(115deg, rgba(255,255,255,.18), transparent 38%),
+    linear-gradient(245deg, rgba(37, 90, 210, .10), transparent 50%);
 }
 
 .screen-label,
