@@ -158,40 +158,13 @@ def load_model():
 
 
 def generate_local_responses(situation):
-    """Ask the local model for both voices in one generation.
+    """Ask the local model for the two voices separately.
 
-    One combined request is noticeably faster on a Raspberry Pi than loading
-    or calling the same model twice. XML-like tags make the small model's
-    response straightforward to split without another dependency.
+    This is slower than one combined prompt, but it is much clearer for small
+    local models. Each request has only one role, so Past Self and Future Self
+    are less likely to mix together or talk about each other in third person.
     """
 
-    prompt = f"""Input: {situation}
-
-Write exactly two short replies in this format:
-<PAST>past reply</PAST>
-<FUTURE>future reply</FUTURE>
-
-Past reply: speak as my Past Self; innocent, curious, bright, comforting.
-Future reply: speak as my Future Self; calm, certain, hopeful, reassuring.
-
-Rules:
-- Final answer only. No thinking.
-- Use only "I" and "you". No third person.
-- Do not say "my friend", "dear", "buddy", "pal", or "child".
-- Do not repeat the input sentence.
-- Each reply: 1 or 2 sentences, under 35 words.
-/no_think"""
-
-    with _model_lock:
-        answer = load_model().ask(prompt)
-
-    parsed = _parse_combined_answer(answer)
-    if parsed:
-        return parsed
-
-    # Small local models occasionally ignore formatting even when the prompt
-    # is explicit. Two simple follow-up requests are slower, but they require
-    # no parsing and keep the installation reliable.
     return _generate_separately(situation)
 
 
@@ -276,23 +249,23 @@ def _valid_pair(past_text, future_text):
 def _generate_separately(situation):
     """Reliable fallback when the combined answer cannot be separated."""
 
-    past_prompt = f"""Input: {situation}
+    past_prompt = f"""Present me says: {situation}
 
-You are my Past Self.
-Speak to me as "you".
-Sound innocent, curious, bright, and comforting.
-Answer my feeling directly with encouragement or comfort.
-Use simple words. No third person. No "my friend".
-Final answer only: 1 or 2 sentences, under 35 words. /no_think"""
+Roleplay as my younger Past Self.
+You are me when I was younger, innocent, curious, and hopeful.
+Speak to present me with "you".
+Encourage or comfort me about this feeling.
+Do not use third person. Do not say "my friend". Do not repeat my exact words.
+Final answer only: 1 or 2 short sentences. /no_think"""
 
-    future_prompt = f"""Input: {situation}
+    future_prompt = f"""Present me says: {situation}
 
-You are my Future Self.
-Speak to me as "you".
-Sound calm, certain, and hopeful.
-Answer my feeling directly and give me confidence for one next step.
-Use simple words. No third person. No "my friend".
-Final answer only: 1 or 2 sentences, under 35 words. /no_think"""
+Roleplay as my older Future Self.
+You are me in the future, mature, wise, calm, and hopeful.
+Speak to present me with "you".
+Encourage or comfort me about this feeling and help me trust one next step.
+Do not use third person. Do not say "my friend". Do not repeat my exact words.
+Final answer only: 1 or 2 short sentences. /no_think"""
 
     with _model_lock:
         model = load_model()
