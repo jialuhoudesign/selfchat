@@ -134,6 +134,26 @@
     }
   }
 
+  async function updateDistanceEffect() {
+    try {
+      const response = await fetch("/distance", { cache: "no-store" });
+      const distance = await response.json();
+      const blur = Number(distance.blur_px || 0);
+      const clarity = Number(distance.clarity || 1);
+
+      document.documentElement.style.setProperty("--distance-blur", `${blur}px`);
+      document.documentElement.style.setProperty("--distance-opacity", String(0.58 + clarity * 0.42));
+      document.documentElement.style.setProperty("--distance-glow", String(0.22 + clarity * 0.38));
+    } catch (error) {
+      // If the sensor is disconnected, keep the words readable.
+      document.documentElement.style.setProperty("--distance-blur", "0px");
+      document.documentElement.style.setProperty("--distance-opacity", "1");
+      document.documentElement.style.setProperty("--distance-glow", ".6");
+    }
+  }
+
   updateFromServer();
+  updateDistanceEffect();
   window.setInterval(updateFromServer, 700);
+  window.setInterval(updateDistanceEffect, 180);
 })();

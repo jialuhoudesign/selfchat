@@ -4,6 +4,9 @@
   --quiet-white: rgba(247, 246, 241, 0.58);
   --line: rgba(255, 255, 255, 0.22);
   --black: #05060a;
+  --distance-blur: 0px;
+  --distance-opacity: 1;
+  --distance-glow: .6;
 }
 
 * { box-sizing: border-box; }
@@ -146,6 +149,9 @@ button, textarea { font: inherit; }
   width: min(78vw, 980px);
   text-align: center;
   transform: translate(-50%, -50%);
+  opacity: var(--distance-opacity);
+  filter: blur(var(--distance-blur));
+  transition: filter .22s ease-out, opacity .22s ease-out;
 }
 
 .voice__intro {
@@ -165,7 +171,9 @@ button, textarea { font: inherit; }
   letter-spacing: -.05em;
   line-height: 1.04;
   text-wrap: balance;
-  text-shadow: 0 4px 40px rgba(0,0,0,.42);
+  text-shadow:
+    0 4px 40px rgba(0,0,0,.42),
+    0 0 42px rgba(255,255,255,var(--distance-glow));
 }
 
 .voice__caption {

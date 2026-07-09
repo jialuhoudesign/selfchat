@@ -13,6 +13,7 @@ import time
 
 from flask import Flask, jsonify, render_template, request
 
+from distance_sensor import get_distance_state, start_distance_sensor
 from local_ai import (
     generate_local_future_response,
     generate_local_past_response,
@@ -330,6 +331,13 @@ def state():
     return jsonify(installation_state)
 
 
+@app.get("/distance")
+def distance():
+    """Return the newest distance-based text clarity state."""
+
+    return jsonify(get_distance_state())
+
+
 @app.get("/health")
 def health():
     """Show whether the Flask app can see and load the local AI toolkit."""
@@ -458,6 +466,10 @@ def reset():
 
 
 if __name__ == "__main__":
+    # Start reading Arduino distance values in the background. If Arduino or
+    # pyserial is missing, this fails softly and text stays clear.
+    start_distance_sensor()
+
     # host="0.0.0.0" also lets another device on the same local network open
     # the installation.  debug is intentionally off for exhibition stability.
     port = int(os.environ.get("SELFCHAT_PORT", "5001"))
