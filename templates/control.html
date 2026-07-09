@@ -3,34 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b0c0e">
+  <meta name="theme-color" content="#d8d6d0">
   <title>SelfChat - Control</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="control">
   <main class="control-panel">
-    <p class="control-panel__kicker">SelfChat / Temporal Self Dialogue</p>
-    <h1>How have you<br>been lately?</h1>
-    <p class="control-panel__lead">
-      Write one feeling, question, or situation here.
-      The two screens will answer as your past and future selves.
-    </p>
+    <h1>How have you been lately?</h1>
 
     <form id="situation-form" class="control-form">
-      <label for="situation">Your answer</label>
+      <label class="visually-hidden" for="situation">Your answer</label>
       <textarea id="situation" name="situation" rows="4" maxlength="600"
-        placeholder="I have been feeling..." required autofocus></textarea>
-      <div class="control-form__actions">
-        <button id="submit-button" class="primary-button" type="submit">Send across time <span>-&gt;</span></button>
-        <button id="reset-button" class="text-button" type="button">Reset both screens</button>
-      </div>
-      <p class="form-status" id="form-status" aria-live="polite">Ready. Your words stay on this local computer.</p>
-    </form>
+        placeholder="Type here..." required autofocus></textarea>
 
-    <aside class="screen-guide">
-      <a href="/future" target="_blank"><strong>Future screen</strong><span>/future</span><em>Cold geometric system</em></a>
-      <a href="/past" target="_blank"><strong>Past screen</strong><span>/past</span><em>Warm memory field</em></a>
-    </aside>
+      <div class="control-form__actions">
+        <button id="submit-button" class="primary-button" type="submit">Send</button>
+        <button id="reset-button" class="text-button" type="button">Reset</button>
+      </div>
+
+      <p class="form-status" id="form-status" aria-live="polite">Ready.</p>
+    </form>
   </main>
 
   <script src="{{ url_for('static', filename='interaction.js') }}"></script>

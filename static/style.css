@@ -18,6 +18,17 @@ body {
 
 button, textarea { font: inherit; }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
 /* ---------- The two physical display pages ---------- */
 .display { height: 100%; overflow: hidden; }
 .display--future { background: #b8ccd9; }
@@ -158,29 +169,108 @@ button, textarea { font: inherit; }
 /* ---------- The separate input/control page ---------- */
 .control {
   min-height: 100vh;
+  color: #101010;
   background:
-    radial-gradient(circle at 85% 10%, rgba(143, 180, 40, .1), transparent 30%),
-    radial-gradient(circle at 10% 90%, rgba(93, 75, 185, .12), transparent 32%),
-    #0a0b0e;
+    linear-gradient(rgba(236, 234, 229, .18), rgba(236, 234, 229, .18)),
+    url("/static/control-background.png") center / cover no-repeat fixed;
+  font-family: Consolas, "Courier New", "SFMono-Regular", Menlo, monospace;
 }
 
-.control-panel { width: min(88vw, 820px); margin: 0 auto; padding: clamp(3rem, 8vh, 7rem) 0 4rem; }
-.control-panel__kicker { margin: 0 0 2rem; color: rgba(255,255,255,.44); font-size: .68rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; }
-.control-panel h1 { margin: 0; font-family: Georgia, serif; font-size: clamp(3rem, 8vw, 6rem); font-weight: 400; letter-spacing: -.055em; line-height: .95; }
-.control-panel__lead { max-width: 37rem; margin: 1.8rem 0 3rem; color: rgba(255,255,255,.56); font-family: Georgia, serif; font-size: 1.05rem; line-height: 1.6; }
+.control-panel {
+  width: min(86vw, 760px);
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(2rem, 6vh, 5rem) 0;
+  text-align: center;
+}
 
-.control-form label { display: block; margin-bottom: .8rem; color: rgba(255,255,255,.46); font-size: .67rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
-.control-form textarea { width: 100%; min-height: 9rem; padding: 1.2rem; resize: vertical; border: 1px solid rgba(255,255,255,.22); border-radius: 2px; outline: 0; background: rgba(255,255,255,.035); color: white; font-family: Georgia, serif; font-size: clamp(1.25rem, 2vw, 1.7rem); line-height: 1.5; }
-.control-form textarea:focus { border-color: rgba(255,255,255,.65); box-shadow: 0 0 0 3px rgba(255,255,255,.05); }
-.control-form textarea::placeholder { color: rgba(255,255,255,.22); }
-.control-form__actions { display: flex; align-items: center; gap: 1.3rem; margin-top: 1.2rem; }
-.primary-button { padding: 1rem 1.2rem; border: 0; border-radius: 2px; background: #f1f1e9; color: #111216; cursor: pointer; font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.primary-button span { margin-left: 1rem; }
-.primary-button:disabled { opacity: .45; cursor: wait; }
-.text-button { padding: .8rem 0; border: 0; border-bottom: 1px solid rgba(255,255,255,.22); background: transparent; color: rgba(255,255,255,.5); cursor: pointer; font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; }
-.primary-button:hover { background: white; }
-.text-button:hover { color: white; border-color: white; }
-.form-status { min-height: 1.2em; margin: 1rem 0 0; color: rgba(255,255,255,.4); font-size: .72rem; }
+.control-panel h1 {
+  max-width: 16ch;
+  margin: 0 0 clamp(1.6rem, 4vh, 3rem);
+  color: #111;
+  font-family: Consolas, "Courier New", "SFMono-Regular", Menlo, monospace;
+  font-size: clamp(2rem, 5.8vw, 4.8rem);
+  font-weight: 400;
+  letter-spacing: -.08em;
+  line-height: .96;
+}
+
+.control-form {
+  width: min(100%, 620px);
+  padding: clamp(1rem, 3vw, 1.7rem);
+  border: 1px solid rgba(0, 0, 0, .26);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .22);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .12);
+  backdrop-filter: blur(10px);
+}
+
+.control-form textarea {
+  width: 100%;
+  min-height: clamp(9rem, 28vh, 15rem);
+  padding: 1.2rem;
+  resize: vertical;
+  border: 1px solid rgba(0, 0, 0, .28);
+  border-radius: 12px;
+  outline: 0;
+  background: rgba(255, 255, 255, .18);
+  color: #050505;
+  font-family: Consolas, "Courier New", "SFMono-Regular", Menlo, monospace;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  line-height: 1.55;
+}
+
+.control-form textarea:focus {
+  border-color: rgba(0, 0, 0, .72);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, .07);
+}
+
+.control-form textarea::placeholder { color: rgba(0, 0, 0, .42); }
+
+.control-form__actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .8rem;
+  margin-top: 1rem;
+}
+
+.primary-button,
+.text-button {
+  min-width: 6.6rem;
+  padding: .75rem 1rem;
+  border: 1px solid rgba(0, 0, 0, .45);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .16);
+  color: #080808;
+  cursor: pointer;
+  font-family: Consolas, "Courier New", "SFMono-Regular", Menlo, monospace;
+  font-size: .82rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.primary-button:hover,
+.text-button:hover {
+  background: rgba(0, 0, 0, .82);
+  color: #f5f2eb;
+}
+
+.primary-button:disabled {
+  opacity: .45;
+  cursor: wait;
+}
+
+.form-status {
+  min-height: 1.2em;
+  margin: .9rem 0 0;
+  color: rgba(0, 0, 0, .58);
+  font-size: .78rem;
+}
 
 .screen-guide { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 3rem; }
 .screen-guide a { display: grid; grid-template-columns: 1fr auto; gap: .45rem; padding: 1.2rem; border: 1px solid rgba(255,255,255,.12); color: white; text-decoration: none; }
