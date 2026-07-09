@@ -70,15 +70,13 @@ def find_model_path(toolkit_root):
 
     app_folder = Path(__file__).resolve().parent
     model_names = [
-        # User-friendly short name. Rename the preferred model to this on the
-        # Pi if you want SelfChat to choose it automatically.
-        "Qwen3.5.gguf",
-        # This smaller model has been more stable on the Raspberry Pi than the
-        # original 2B model while testing SelfChat.
-        "Qwen3.5-0.8B-Q4_K_M.gguf",
-        # Keep the toolkit's original model as a fallback if it is the only
-        # model available.
+        # Prefer the larger 2B model for better language quality.
         "Qwen3.5-2B-Q4_K_S.gguf",
+        # User-friendly short name, used as a fallback if the 2B file is not
+        # present on the Pi.
+        "Qwen3.5.gguf",
+        # Original smaller filename, kept as another fallback.
+        "Qwen3.5-0.8B-Q4_K_M.gguf",
     ]
     model_folders = [
         toolkit_root / "models",
