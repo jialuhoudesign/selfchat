@@ -143,7 +143,7 @@
     ctx.lineWidth = 1;
 
     const spacing = 170;
-    const offset = (time * 24) % spacing;
+    const offset = (time * 48) % spacing;
     for (let x = -spacing; x < width + spacing; x += spacing * 1.4) {
       ctx.beginPath();
       ctx.moveTo(x + offset, height * 0.08);
@@ -169,8 +169,8 @@
     ];
 
     points.forEach(([x, y], index) => {
-      const ox = Math.sin(time * 0.8 + index) * 10;
-      const oy = Math.cos(time * 0.6 + index) * 8;
+      const ox = Math.sin(time * 1.15 + index) * 24;
+      const oy = Math.cos(time * 0.95 + index) * 18;
       ctx.beginPath();
       ctx.moveTo(x + ox, y + oy);
       ctx.lineTo(width * (0.48 + index * 0.07), height * (0.42 + index * 0.08));
@@ -183,6 +183,27 @@
     ctx.lineTo(width * 0.78, height * 0.10);
     ctx.stroke();
 
+    ctx.restore();
+  }
+
+  function drawFutureScanner() {
+    if (!isFuture) return;
+
+    const y = (time * 120) % (height + 180) - 90;
+    const gradient = ctx.createLinearGradient(0, y - 40, 0, y + 40);
+    gradient.addColorStop(0, "rgba(255,255,255,0)");
+    gradient.addColorStop(0.5, "rgba(215,235,245,0.22)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+    ctx.save();
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, y - 40, width, 80);
+    ctx.strokeStyle = "rgba(160, 20, 45, 0.32)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
     ctx.restore();
   }
 
@@ -200,9 +221,9 @@
     ];
 
     blocks.forEach(([x, y, w, h], index) => {
-      const drift = Math.sin(time * 0.7 + index) * width * 0.012;
+      const drift = Math.sin(time * 1.05 + index) * width * 0.035;
       const px = x * width + drift;
-      const py = y * height + Math.cos(time * 0.5 + index) * height * 0.01;
+      const py = y * height + Math.cos(time * 0.85 + index) * height * 0.024;
       const bw = w * width;
       const bh = h * height;
 
@@ -223,7 +244,7 @@
     // Rectangular wireframe system.
     ctx.strokeStyle = "rgba(117, 31, 52, 0.48)";
     ctx.lineWidth = 1;
-    const offset = (time * 18) % 80;
+    const offset = (time * 44) % 80;
     for (let x = -80 + offset; x < width + 80; x += 120) {
       ctx.beginPath();
       ctx.moveTo(x, height * 0.12);
@@ -234,8 +255,8 @@
     ctx.strokeStyle = "rgba(30, 64, 82, 0.26)";
     for (let y = height * 0.16; y < height * 0.9; y += height * 0.13) {
       ctx.beginPath();
-      ctx.moveTo(width * 0.08, y + Math.sin(time + y) * 8);
-      ctx.lineTo(width * 0.92, y + Math.sin(time * 0.7 + y) * 8);
+      ctx.moveTo(width * 0.08, y + Math.sin(time * 1.4 + y) * 18);
+      ctx.lineTo(width * 0.92, y + Math.sin(time * 1.1 + y) * 18);
       ctx.stroke();
     }
 
@@ -247,8 +268,8 @@
 
     ctx.fillStyle = "rgba(14, 38, 52, 0.68)";
     for (let i = 0; i < 38; i += 1) {
-      const x = ((i * 97) % width) + Math.sin(time + i) * 10;
-      const y = ((i * 53) % height) + Math.cos(time * 0.8 + i) * 8;
+      const x = ((i * 97) % width) + Math.sin(time * 1.8 + i) * 28;
+      const y = ((i * 53) % height) + Math.cos(time * 1.3 + i) * 18;
       ctx.fillRect(x, y, 2, 2);
     }
 
@@ -310,9 +331,9 @@
   }
 
   function drawPastFlower(centerX, centerY, scale, phase, warmColor, leafColor) {
-    const sway = Math.sin(time * 0.55 + phase);
-    const x = centerX + sway * width * 0.018;
-    const y = centerY + Math.cos(time * 0.4 + phase) * height * 0.012;
+    const sway = Math.sin(time * 0.95 + phase);
+    const x = centerX + sway * width * 0.045;
+    const y = centerY + Math.cos(time * 0.75 + phase) * height * 0.028;
 
     // Soft stem and leaves, like out-of-focus film.
     ctx.save();
@@ -336,14 +357,15 @@
     // Flower head made of slow breathing translucent petals.
     for (let i = 0; i < 7; i += 1) {
       const angle = (i / 7) * Math.PI * 2 + sway * 0.12;
-      const px = x + Math.cos(angle) * 34 * scale;
-      const py = y + Math.sin(angle) * 24 * scale;
+      const breathing = 1 + Math.sin(time * 1.15 + i + phase) * 0.18;
+      const px = x + Math.cos(angle) * 34 * scale * breathing;
+      const py = y + Math.sin(angle) * 24 * scale * breathing;
       drawPetal(
         px,
         py,
-        (58 + Math.sin(time + i) * 5) * scale,
-        (35 + Math.cos(time * 0.8 + i) * 4) * scale,
-        angle + Math.PI * 0.2,
+        (58 + Math.sin(time * 1.3 + i) * 12) * scale,
+        (35 + Math.cos(time * 1.1 + i) * 8) * scale,
+        angle + Math.PI * 0.2 + Math.sin(time + phase) * 0.15,
         warmColor,
         0.18
       );
@@ -386,13 +408,14 @@
       drawFutureGeometry();
       drawFutureScanLines();
       drawFuturePosterMarks();
+      drawFutureScanner();
     } else {
       drawPastFloralMemory();
     }
 
     if (!reducedMotion) {
       // This speed is intentionally visible but still calm.
-      time += 0.018;
+      time += 0.035;
     }
 
     requestAnimationFrame(draw);
