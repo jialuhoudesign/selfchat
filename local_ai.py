@@ -172,11 +172,13 @@ def get_ai_status():
     """Return small, JSON-safe diagnostics for the /health page."""
 
     toolkit_root = find_toolkit_root()
+    model_path = find_model_path(toolkit_root) if toolkit_root else None
     return {
         "mode": AI_MODE,
         "local_enabled": local_ai_enabled(),
         "toolkit_found": toolkit_root is not None,
         "toolkit_path": str(toolkit_root) if toolkit_root else "",
+        "model_path": str(model_path) if model_path else "",
         "model_loaded": _model is not None,
         "load_error": _load_error,
     }
@@ -253,19 +255,23 @@ def _generate_separately(situation):
 
 Roleplay as my younger Past Self.
 You are me when I was younger, innocent, curious, and hopeful.
-Speak to present me with "you".
-Encourage or comfort me about this feeling.
-Do not use third person. Do not say "my friend". Do not repeat my exact words.
-Final answer only: 1 or 2 short sentences. /no_think"""
+Start with a curious, young voice, such as "Hey," or "What if".
+Speak to present me with "you" and "we".
+Encourage me about this feeling in a small, bright, childlike way.
+Do not say: I see you, I hear you, support you, my friend, the world, sun.
+Do not repeat my exact words. No third person.
+Final answer only: 2 short sentences. /no_think"""
 
     future_prompt = f"""Present me says: {situation}
 
 Roleplay as my older Future Self.
 You are me in the future, mature, wise, calm, and hopeful.
-Speak to present me with "you".
-Encourage or comfort me about this feeling and help me trust one next step.
-Do not use third person. Do not say "my friend". Do not repeat my exact words.
-Final answer only: 1 or 2 short sentences. /no_think"""
+Start exactly with: I have lived past this
+Speak to present me with "you" and "we".
+Give me steady hope and one small next step.
+Do not say: I see you, I hear you, support you, my friend, the world, sun.
+Do not repeat my exact words. No third person.
+Final answer only: 2 short sentences. /no_think"""
 
     with _model_lock:
         model = load_model()
@@ -325,8 +331,13 @@ def _response_is_usable(text):
         "dear",
         "buddy",
         " pal",
+        "i see you",
+        "i hear you",
+        "support you",
         "the visitor",
         "the person",
+        "the world",
+        " sun ",
         "new choice",
         "connects to something",
         "once dreamed about",
@@ -378,6 +389,13 @@ if __name__ == "__main__":
     test_situation = " ".join(sys.argv[1:]).strip()
     if not test_situation:
         test_situation = "I am uncertain about a new beginning."
+
+    toolkit_root = find_toolkit_root()
+    selected_model = find_model_path(toolkit_root) if toolkit_root else None
+    if selected_model:
+        print(f"Using model: {selected_model.name}")
+    else:
+        print("Using model: toolkit default")
 
     print("Loading local model...")
     past, future = generate_local_responses(test_situation)
