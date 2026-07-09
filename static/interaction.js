@@ -83,7 +83,9 @@
   };
 
   function changeMessage(state) {
-    if (state.status === "thinking") {
+    const response = state[`${selfType}_response`];
+
+    if (state.status === "thinking" && !response) {
       voice.hidden = true;
       listening.classList.add("is-visible");
       listening.setAttribute("aria-hidden", "false");
@@ -93,7 +95,6 @@
     voice.hidden = false;
     listening.classList.remove("is-visible");
     listening.setAttribute("aria-hidden", "true");
-    const response = state[`${selfType}_response`];
     const text = response ? {
       intro: selfType === "past" ? "I remember this feeling." : "I remember you here.",
       message: response,

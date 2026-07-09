@@ -165,6 +165,18 @@ def generate_local_responses(situation):
     return _generate_separately(situation)
 
 
+def generate_local_past_response(situation):
+    """Generate only the Past Self voice so it can appear first."""
+
+    return _generate_one_response(situation, "past")
+
+
+def generate_local_future_response(situation):
+    """Generate only the Future Self voice after Past Self is visible."""
+
+    return _generate_one_response(situation, "future")
+
+
 def get_ai_status():
     """Return small, JSON-safe diagnostics for the /health page."""
 
@@ -248,6 +260,19 @@ def _valid_pair(past_text, future_text):
 def _generate_separately(situation):
     """Reliable fallback when the combined answer cannot be separated."""
 
+    past_response = generate_local_past_response(situation)
+    future_response = generate_local_future_response(situation)
+
+    if not _response_is_usable(past_response) or not _response_is_usable(
+        future_response
+    ):
+        return _safe_template_responses(situation)
+    return past_response, future_response
+
+
+def _generate_one_response(situation, voice):
+    """Generate one voice at a time for faster visible feedback."""
+
     past_prompt = f"""Present feeling: {situation}
 
 You are my younger self from childhood.
@@ -270,16 +295,16 @@ Do not sound like a therapist, teacher, or friend.
 Do not say: I see you, I hear you, support you, my friend, the world, sun.
 Write only 2 short sentences. /no_think"""
 
+    prompt = past_prompt if voice == "past" else future_prompt
     with _model_lock:
         model = load_model()
-        past_response = _ask_for_usable_response(model, past_prompt)
-        future_response = _ask_for_usable_response(model, future_prompt)
+        response = _ask_for_usable_response(model, prompt)
 
-    if not _response_is_usable(past_response) or not _response_is_usable(
-        future_response
-    ):
-        return _safe_template_responses(situation)
-    return past_response, future_response
+    if _response_is_usable(response):
+        return response
+
+    past_fallback, future_fallback = _safe_template_responses(situation)
+    return past_fallback if voice == "past" else future_fallback
 
 
 def _ask_for_usable_response(model, prompt):
@@ -413,6 +438,12 @@ if __name__ == "__main__":
         print("Using model: toolkit default")
 
     print("Loading local model...")
-    past, future = generate_local_responses(test_situation)
-    print(f"\nPAST:\n{past}\n")
-    print(f"FUTURE:\n{future}")
+    load_model()
+
+    print("\nGenerating Past Self...")
+    past = generate_local_past_response(test_situation)
+    print(f"\nPAST:\n{past}\n", flush=True)
+
+    print("Generating Future Self...")
+    future = generate_local_future_response(test_situation)
+    print(f"FUTURE:\n{future}", flush=True)

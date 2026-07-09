@@ -10,7 +10,8 @@ from hashlib import sha256
 from flask import Flask, jsonify, render_template, request
 
 from local_ai import (
-    generate_local_responses,
+    generate_local_future_response,
+    generate_local_past_response,
     get_ai_status,
     load_model,
     local_ai_enabled,
@@ -239,7 +240,17 @@ def respond():
     ai_error = ""
     if local_ai_enabled():
         try:
-            past_response, future_response = generate_local_responses(situation)
+            past_response = generate_local_past_response(situation)
+            installation_state.update(
+                version=installation_state["version"] + 1,
+                past_response=past_response,
+                future_response="",
+                status="thinking",
+                response_source="local",
+                ai_error="",
+            )
+
+            future_response = generate_local_future_response(situation)
             response_source = "local"
         except Exception as error:
             # Stability matters in an exhibition. If the local model fails or
