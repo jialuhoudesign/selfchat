@@ -193,8 +193,8 @@ button, textarea { font: inherit; }
 .voice.is-changing { animation: message-arrives 1.25s cubic-bezier(.2,.75,.2,1) both; }
 
 @keyframes message-arrives {
-  from { opacity: 0; filter: blur(10px); transform: translate(-50%, calc(-50% + 22px)); }
-  to { opacity: 1; filter: blur(0); transform: translate(-50%, -50%); }
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 22px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
 }
 
 .listening {

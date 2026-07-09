@@ -28,8 +28,8 @@ BAUD_RATE = int(os.environ.get("SELFCHAT_DISTANCE_BAUD", "9600"))
 GOOD_MIN_CM = float(os.environ.get("SELFCHAT_CLEAR_MIN_CM", "50"))
 GOOD_MAX_CM = float(os.environ.get("SELFCHAT_CLEAR_MAX_CM", "60"))
 NEAR_FULL_BLUR_CM = float(os.environ.get("SELFCHAT_NEAR_BLUR_CM", "30"))
-FAR_FULL_BLUR_CM = float(os.environ.get("SELFCHAT_FAR_BLUR_CM", "100"))
-MAX_BLUR_PX = float(os.environ.get("SELFCHAT_MAX_BLUR_PX", "12"))
+FAR_FULL_BLUR_CM = float(os.environ.get("SELFCHAT_FAR_BLUR_CM", "75"))
+MAX_BLUR_PX = float(os.environ.get("SELFCHAT_MAX_BLUR_PX", "18"))
 
 _number_pattern = re.compile(r"-?\d+(?:\.\d+)?")
 _distance_label_pattern = re.compile(
