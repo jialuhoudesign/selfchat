@@ -93,14 +93,15 @@ def load_model():
                     os.getenv("SELFCHAT_CPU_THREADS", str(os.cpu_count() or 4))
                 ),
                 "gpu_layers": int(os.getenv("SELFCHAT_GPU_LAYERS", "0")),
-                "temperature": float(os.getenv("SELFCHAT_TEMPERATURE", "0.72")),
+                "temperature": float(os.getenv("SELFCHAT_TEMPERATURE", "0.66")),
                 "top_p": 0.9,
                 "max_tokens": int(os.getenv("SELFCHAT_MAX_TOKENS", "190")),
                 "verbose": False,
                 "system_prompt": (
-                    "You write two short, emotionally sensitive reflections for an "
-                    "art installation. Be warm and human, never clinical. Do not give "
-                    "medical advice. Follow the requested output format exactly."
+                    "You write two short voices for an emotional art installation. "
+                    "The writing should feel poetic, simple, intimate, and human. "
+                    "Never sound clinical. Do not give medical advice. Follow the "
+                    "requested output format exactly."
                 ),
             }
             if MODEL_ENV:
@@ -138,16 +139,25 @@ def generate_local_responses(situation):
 
 {situation}
 
-Write two different responses in English.
+Write two different responses in English for an artwork called SelfChat.
 
-PAST SELF: gentle, sincere, reflective and slightly vulnerable. Speak like a
-past version of the visitor remembering where they came from.
+PAST SELF voice:
+- Speak like a younger past self inside the visitor.
+- Be innocent, curious, bright, and gently vulnerable.
+- If the visitor made a new choice, encourage them as if this choice touches an old childhood dream.
+- If the visitor feels sad, remind them of small happy things, playfulness, courage, and where they began.
+- Cheer them up without being silly. Sound tender, not wise or adult.
 
-FUTURE SELF: calm, grounded, wise and reassuring. Speak like a future version
-looking back at this present moment.
+FUTURE SELF voice:
+- Speak like an older future self looking back with calm strength.
+- Be grounded, wise, reassuring, and steady.
+- If the visitor feels lost, help them trust the next small step.
+- If the visitor feels sad, offer reliable hope and quiet confidence.
+- Do not promise that everything is perfect. Give hope that feels real.
 
-Each response must be 2 or 3 short sentences and under 65 words. Do not repeat
-the visitor's words verbatim. Do not copy phrases from these instructions.
+Each response must be 2 short sentences and under 55 words. Mention one concrete
+detail from the visitor's situation if possible, but do not repeat the whole
+sentence. Do not copy phrases from these instructions.
 
 Return exactly two sections. Start with the opening tag <PAST>, immediately
 write the original Past Self response, and close it with </PAST>. Then start
@@ -250,15 +260,19 @@ def _generate_separately(situation):
 
     past_prompt = f"""The visitor says: {situation}
 
-Reply as their past self. Be gentle, sincere, reflective, and slightly
-vulnerable, remembering where they came from. Write only the response: 2 or 3
-short sentences, under 65 words. Do not add a title, label, or explanation."""
+Reply as their younger past self. Be innocent, curious, bright, encouraging,
+and gently vulnerable. If this is a new choice, treat it like it touches an old
+childhood dream. If they are sad, remind them of small happy things and where
+they began. Write only the response: 2 short sentences, under 55 words. Do not
+add a title, label, or explanation."""
 
     future_prompt = f"""The visitor says: {situation}
 
-Reply as their future self. Be calm, grounded, wise, and reassuring, looking
-back at their present moment. Write only the response: 2 or 3 short sentences,
-under 65 words. Do not add a title, label, or explanation."""
+Reply as their future self. Be calm, grounded, wise, reassuring, and quietly
+hopeful. If they are lost, help them trust the next small step. If they are
+sad, give reliable confidence without pretending everything is perfect. Write
+only the response: 2 short sentences, under 55 words. Do not add a title, label,
+or explanation."""
 
     with _model_lock:
         model = load_model()
