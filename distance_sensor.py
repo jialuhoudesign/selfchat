@@ -112,7 +112,7 @@ def _parse_distance(line: str) -> float | None:
         match = _number_pattern.search(line)
     if not match:
         return None
-    value = float(match.group(0))
+    value = float(match.group(1) if match.lastindex else match.group(0))
     # Ignore physically unlikely values and diagnostic lines.
     if value <= 0 or value > 500:
         return None
