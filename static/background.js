@@ -22,6 +22,11 @@
   let height = 0;
   let time = Math.random() * 100;
   let blobs = [];
+  let lastFrameTime = 0;
+
+  // Raspberry Pi friendly frame cap.  The artwork still feels alive, but we
+  // avoid forcing the browser to redraw expensive gradients 60 times a second.
+  const targetFrameMs = 1000 / 24;
 
   const pastColors = [
     [255, 205, 26],  // vivid yellow
@@ -47,13 +52,13 @@
   }
 
   function createBlobs() {
-    const count = isFuture ? 0 : 8;
+    const count = isFuture ? 0 : 5;
     const colors = isFuture ? futureColors : pastColors;
 
     blobs = Array.from({ length: count }, (_, index) => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      baseRadius: Math.min(width, height) * (0.2 + Math.random() * 0.2),
+      baseRadius: Math.min(width, height) * (0.18 + Math.random() * 0.16),
       driftX: 65 + Math.random() * 120,
       driftY: 45 + Math.random() * 95,
       speed: 0.28 + Math.random() * 0.34,
@@ -354,9 +359,10 @@
     drawPetal(x + 38 * scale, y + 205 * scale, 94 * scale, 38 * scale, 0.42, leafColor, 0.16);
     ctx.restore();
 
-    // Flower head made of slow breathing translucent petals.
-    for (let i = 0; i < 7; i += 1) {
-      const angle = (i / 7) * Math.PI * 2 + sway * 0.12;
+    // Flower head made of slow breathing translucent petals.  Four petals are
+    // enough to create the soft floral memory without overworking the Pi.
+    for (let i = 0; i < 4; i += 1) {
+      const angle = (i / 4) * Math.PI * 2 + sway * 0.12;
       const breathing = 1 + Math.sin(time * 1.4 + i + phase) * 0.28;
       const px = x + Math.cos(angle) * 34 * scale * breathing;
       const py = y + Math.sin(angle) * 24 * scale * breathing;
@@ -384,15 +390,14 @@
 
     ctx.save();
     ctx.globalCompositeOperation = "source-over";
-    drawPastFlower(width * 0.30, height * 0.42, Math.min(width, height) / 650, 0.1, [255, 92, 28], [166, 216, 92]);
-    drawPastFlower(width * 0.65, height * 0.36, Math.min(width, height) / 720, 1.8, [255, 209, 32], [181, 224, 100]);
-    drawPastFlower(width * 0.50, height * 0.70, Math.min(width, height) / 760, 3.2, [255, 135, 22], [149, 210, 88]);
+    drawPastFlower(width * 0.32, height * 0.42, Math.min(width, height) / 690, 0.1, [255, 92, 28], [166, 216, 92]);
+    drawPastFlower(width * 0.66, height * 0.38, Math.min(width, height) / 760, 1.8, [255, 209, 32], [181, 224, 100]);
     ctx.restore();
 
     // Fine moving film grain, kept sparse for Pi performance.
     ctx.save();
     ctx.globalAlpha = 0.10;
-    for (let i = 0; i < 180; i += 1) {
+    for (let i = 0; i < 55; i += 1) {
       const x = (Math.sin(i * 17.13 + time * 0.7) * 0.5 + 0.5) * width;
       const y = (Math.cos(i * 23.71 + time * 0.5) * 0.5 + 0.5) * height;
       ctx.fillStyle = i % 3 === 0
@@ -418,7 +423,7 @@
     ctx.save();
     ctx.globalCompositeOperation = "source-over";
 
-    for (let i = 0; i < 12; i += 1) {
+    for (let i = 0; i < 8; i += 1) {
       const color = orbColors[i % orbColors.length];
       const baseX = ((i * 137) % 1000) / 1000 * width;
       const baseY = ((i * 263) % 1000) / 1000 * height;
@@ -450,13 +455,13 @@
     ctx.save();
     ctx.lineCap = "round";
 
-    for (let row = 0; row < 4; row += 1) {
+    for (let row = 0; row < 3; row += 1) {
       ctx.beginPath();
       const baseY = height * (0.18 + row * 0.19);
       const amplitude = height * (0.09 + row * 0.012);
 
-      for (let step = 0; step <= 90; step += 1) {
-        const p = step / 90;
+      for (let step = 0; step <= 58; step += 1) {
+        const p = step / 58;
         const x = p * width;
         const y =
           baseY +
@@ -487,7 +492,7 @@
       "rgba(255, 255, 255, 0.28)",
     ];
 
-    for (let i = 0; i < 220; i += 1) {
+    for (let i = 0; i < 70; i += 1) {
       const cluster = i % 3;
       const cx = cluster === 0 ? width * 0.25 : cluster === 1 ? width * 0.62 : width * 0.78;
       const cy = cluster === 0 ? height * 0.30 : cluster === 1 ? height * 0.54 : height * 0.25;
@@ -506,7 +511,13 @@
     ctx.restore();
   }
 
-  function draw() {
+  function draw(now) {
+    if (now - lastFrameTime < targetFrameMs) {
+      requestAnimationFrame(draw);
+      return;
+    }
+    lastFrameTime = now;
+
     drawBase();
 
     if (isFuture) {

@@ -84,7 +84,7 @@ button, textarea { font: inherit; }
 }
 
 .display.is-thinking #temporal-canvas {
-  filter: saturate(1.25) contrast(1.08) brightness(1.04);
+  filter: none;
 }
 
 #temporal-canvas,
