@@ -35,7 +35,7 @@ AI_TIMEOUT_SECONDS = 20
 
 # If the app falls back to mock instantly, keep the thinking animation visible
 # for a short moment so the experience still feels intentional.
-MIN_THINKING_SECONDS = 2.4
+MIN_THINKING_SECONDS = 10.0
 
 # This in-memory state is shared by the two display pages and the control page.
 # It resets whenever the Flask app restarts, which is useful for an exhibition.
@@ -66,6 +66,63 @@ def create_mock_responses(situation):
     # 2. Past Self sentences;
     # 3. Future Self sentences.
     themes = [
+        (
+            [
+                "happy",
+                "excited",
+                "exciting",
+                "proud",
+                "good",
+                "great",
+                "joy",
+                "joyful",
+                "glad",
+                "thrilled",
+                "hopeful",
+                "looking forward",
+                "celebrate",
+                "success",
+                "开心",
+                "高兴",
+                "兴奋",
+                "期待",
+                "快乐",
+                "骄傲",
+                "很开心",
+                "很棒",
+                "成功",
+            ],
+            [
+                {
+                    "past": "I want to jump around with this feeling and put it somewhere safe in our pocket.",
+                    "future": "Let yourself receive this joy fully; it is not a trick, it is part of your life.",
+                },
+                {
+                    "past": "See, joy found us; let us look at it closely so we remember its shape.",
+                    "future": "Remember this evidence: good things can reach you, and you are allowed to enjoy them.",
+                },
+                {
+                    "past": "Let us keep this little sun; it can warm us on a harder day.",
+                    "future": "Do not rush past the brightness; gratitude is also a form of strength.",
+                },
+                {
+                    "past": "I knew there would be golden days, and look, here is one.",
+                    "future": "Let this moment become proof that more light can come.",
+                },
+                {
+                    "past": "Let us celebrate without shrinking it; happiness can be trusted too.",
+                    "future": "You are allowed to be proud without immediately becoming afraid.",
+                },
+                {
+                    "past": "This feels like opening a window and finding the whole sky waiting.",
+                    "future": "Follow this excitement with care; it is showing you where life feels alive.",
+                },
+                {
+                    "past": "I want to run toward this bright thing with both hands open.",
+                    "future": "Let the excitement become a steady beginning, not pressure to be perfect.",
+                },
+            ],
+        ),
         (
             ["sad", "upset", "cry", "heavy", "hurt", "depressed", "down", "难过", "伤心", "想哭", "痛苦"],
             [
@@ -593,6 +650,546 @@ def create_mock_responses(situation):
     return pair["past"], pair["future"]
 
 
+def create_mock_responses(situation):
+    """Final exhibition mock library: paired, varied, and role-specific.
+
+    This final definition intentionally overrides the older drafts above.
+    Each response is a matched Past/Future pair, so the two screens feel like
+    one coherent temporal dialogue instead of two unrelated random sentences.
+    """
+
+    lowered = situation.lower()
+
+    themes = [
+        (
+            [
+                "happy", "excited", "exciting", "proud", "good", "great",
+                "joy", "joyful", "glad", "thrilled", "hopeful",
+                "looking forward", "celebrate", "success", "开心", "高兴",
+                "兴奋", "期待", "快乐", "骄傲", "成功",
+            ],
+            [
+                {
+                    "past": "I want to jump around with this feeling and put it somewhere safe in our pocket.",
+                    "future": "Let yourself receive this joy fully; it is not a trick, it is part of your life.",
+                },
+                {
+                    "past": "See, joy found us; let us look at it closely so we remember its shape.",
+                    "future": "Remember this evidence: good things can reach you, and you are allowed to enjoy them.",
+                },
+                {
+                    "past": "Let us keep this little sun; it can warm us on a harder day.",
+                    "future": "Do not rush past the brightness; gratitude is also a form of strength.",
+                },
+                {
+                    "past": "I knew there would be golden days, and look, here is one.",
+                    "future": "Let this moment become proof that more light can come.",
+                },
+                {
+                    "past": "Let us celebrate without shrinking it; happiness can be trusted too.",
+                    "future": "You are allowed to be proud without immediately becoming afraid.",
+                },
+                {
+                    "past": "This feels like opening a window and finding the whole sky waiting.",
+                    "future": "Follow this excitement with care; it is showing you where life feels alive.",
+                },
+                {
+                    "past": "I want to run toward this bright thing with both hands open.",
+                    "future": "Let the excitement become a steady beginning, not pressure to be perfect.",
+                },
+                {
+                    "past": "I am smiling so hard because we did not know this kind of day could find us.",
+                    "future": "This happiness is safe to inhabit; let it settle into your body as proof.",
+                },
+                {
+                    "past": "Can we remember this forever, the part where something finally feels possible?",
+                    "future": "Possibility is speaking clearly right now; answer it with one committed step.",
+                },
+                {
+                    "past": "I want to make a little crown out of this moment and wear it all afternoon.",
+                    "future": "Receive the recognition without apology; you worked, you hoped, and you arrived here.",
+                },
+            ],
+        ),
+        (
+            ["sad", "upset", "cry", "heavy", "hurt", "depressed", "down", "难过", "伤心", "想哭", "痛苦"],
+            [
+                {
+                    "past": "Let us find one tiny warm thing today, even if the big cloud is still here.",
+                    "future": "This sadness is real, but it is not the whole story; stay with yourself for one more breath.",
+                },
+                {
+                    "past": "Maybe this sadness is asking us to be held softly, not fixed all at once.",
+                    "future": "You do not need to climb out all at once; one kind action is enough for this minute.",
+                },
+                {
+                    "past": "I am small and curious, and I still believe a little light can sneak back in.",
+                    "future": "Let the feeling pass through without naming it forever; hope is still quietly working.",
+                },
+                {
+                    "past": "If today feels blue, we can still keep one yellow pebble in our pocket.",
+                    "future": "You are allowed to hurt and still be moving toward a softer morning.",
+                },
+                {
+                    "past": "Let us sit beside this feeling like rain on the window, not the whole sky.",
+                    "future": "This moment will change shape; remain gentle until it does.",
+                },
+                {
+                    "past": "I brought a blanket for the part of us that does not want to be brave today.",
+                    "future": "You do not have to perform strength; being honest with the ache is already care.",
+                },
+                {
+                    "past": "Maybe we can cry and still leave one tiny space for tomorrow.",
+                    "future": "Tomorrow does not need you to be healed; it only asks you to stay reachable.",
+                },
+                {
+                    "past": "I will sit on the floor with you until the feeling stops being so sharp.",
+                    "future": "Nothing about this pain makes you less worthy of tenderness, rest, or return.",
+                },
+                {
+                    "past": "Let us look for the smallest color in the room, just to prove the world is still here.",
+                    "future": "Let one ordinary detail anchor you; the larger wave will pass through.",
+                },
+                {
+                    "past": "I still believe in our soft little heart, even when it feels bruised.",
+                    "future": "Your heart is not failing; it is asking for gentleness while it repairs.",
+                },
+            ],
+        ),
+        (
+            ["anxious", "nervous", "worry", "worried", "afraid", "scared", "焦虑", "害怕", "担心", "紧张"],
+            [
+                {
+                    "past": "Our heart is making thunder, but thunder does not always mean danger.",
+                    "future": "Fear is loud right now, but it is not the only voice; take the next small action.",
+                },
+                {
+                    "past": "What if we hold the scary thought like a bug in a jar and just look at it?",
+                    "future": "You do not need to defeat the worry first; move gently while it becomes quieter.",
+                },
+                {
+                    "past": "We can be shaky and still try; tiny knees can carry brave feet.",
+                    "future": "This feeling can ride beside you without choosing the direction.",
+                },
+                {
+                    "past": "Let us count one breath, then another, like stepping stones across a stream.",
+                    "future": "Return to the body, lower the scale, and do only the next possible thing.",
+                },
+                {
+                    "past": "Maybe courage is just our small hand reaching forward while it shakes.",
+                    "future": "You are safer than the alarm says; let your breath prove the present moment.",
+                },
+                {
+                    "past": "The scary thing looks giant because we are standing very close to it.",
+                    "future": "Step back by one breath; perspective will return before certainty does.",
+                },
+                {
+                    "past": "I want to whisper to the worry: thank you, but we are still allowed to play.",
+                    "future": "Your alarm is trying to protect you; thank it, then choose with your wiser self.",
+                },
+                {
+                    "past": "Let us make the monster smaller by giving it a silly name.",
+                    "future": "Name the fear clearly; what can be named can be carried more lightly.",
+                },
+                {
+                    "past": "I know the dark hallway feels long, but we only need the next doorknob.",
+                    "future": "Do not solve the whole future from inside this pulse; touch the next handle.",
+                },
+                {
+                    "past": "We can be afraid and curious at the same time, like opening a mystery box.",
+                    "future": "Let curiosity walk beside fear; it will keep the path from closing.",
+                },
+            ],
+        ),
+        (
+            ["tired", "exhausted", "burnt", "burnout", "sleepy", "累", "疲惫", "没力气"],
+            [
+                {
+                    "past": "Even brave little creatures curl up sometimes; resting can be part of the adventure.",
+                    "future": "Rest will not erase your progress; it will help you return with more of yourself.",
+                },
+                {
+                    "past": "What if we stop trying so hard for a moment and let the quiet help us?",
+                    "future": "You are allowed to pause before the next step; steadiness is built slowly.",
+                },
+                {
+                    "past": "Let us become a seed for a while; seeds look still when they are growing.",
+                    "future": "Recovery is not a delay; it is part of the work becoming sustainable.",
+                },
+                {
+                    "past": "I think naps and tiny snacks can be heroic too.",
+                    "future": "Your worth is not measured by how much you can carry while exhausted.",
+                },
+                {
+                    "past": "Maybe the softest thing is the bravest thing today.",
+                    "future": "Slow down without shame; the path is still here when you breathe again.",
+                },
+                {
+                    "past": "Let us build a little fort and put the tiredness inside where it can sleep.",
+                    "future": "Protect your energy as if it belongs to someone you love, because it does.",
+                },
+                {
+                    "past": "We do not have to sparkle right now; being a small warm light is enough.",
+                    "future": "Enoughness is not earned by exhaustion; it is already underneath you.",
+                },
+                {
+                    "past": "I will turn the volume down so we can hear ourselves again.",
+                    "future": "Lower the demands until your body believes you are on its side.",
+                },
+            ],
+        ),
+        (
+            ["lost", "confused", "uncertain", "stuck", "迷茫", "困惑", "不知道", "卡住"],
+            [
+                {
+                    "past": "What if not knowing is just the first page of a treasure map?",
+                    "future": "You do not need the whole map tonight; choose the next clear step and let it be enough.",
+                },
+                {
+                    "past": "We can be lost and still be explorers; let us choose one little direction.",
+                    "future": "Clarity will arrive through movement, not pressure; begin with what is nearest.",
+                },
+                {
+                    "past": "Maybe the path is shy today, but one curious step can wake it up.",
+                    "future": "This uncertainty will become information later; stay steady and move one small piece.",
+                },
+                {
+                    "past": "Being unsure can still be an adventure if we hold a small lamp.",
+                    "future": "The future is not asking for certainty; it is asking for one honest step.",
+                },
+                {
+                    "past": "Let us draw a tiny arrow and follow it only as far as today.",
+                    "future": "Trust the small decision you can make today; the larger path will answer later.",
+                },
+                {
+                    "past": "I like mysteries; maybe this one is not here to trap us.",
+                    "future": "Treat the unknown as a room you can enter slowly, not a verdict against you.",
+                },
+                {
+                    "past": "If the map is missing, we can follow the feeling that still glows.",
+                    "future": "Your inner signal may be quiet, but it has not disappeared.",
+                },
+                {
+                    "past": "Let us make one little experiment and see what the world says back.",
+                    "future": "You do not need a final answer; you need a testable next step.",
+                },
+            ],
+        ),
+        (
+            ["phd", "study", "school", "exam", "project", "work", "career", "start", "begin", "学习", "考试", "项目", "工作", "开始"],
+            [
+                {
+                    "past": "What if this big beginning is one of the dreams we used to draw in secret?",
+                    "future": "Begin with the next page, the next note, the next hour; confidence will meet you in motion.",
+                },
+                {
+                    "past": "We are allowed to be new at this; new things are where wonder lives.",
+                    "future": "You do not need to feel ready to be ready enough; start small and keep returning.",
+                },
+                {
+                    "past": "This is big, but we have always liked opening doors just to see the light inside.",
+                    "future": "This path will teach you as you walk it, and you will grow into the room.",
+                },
+                {
+                    "past": "I want to clap for us, because trying something new still feels like magic.",
+                    "future": "The future is built through ordinary hours; protect the next one and continue.",
+                },
+                {
+                    "past": "Let us be beginners with bright eyes; that is where the adventure starts.",
+                    "future": "Your confidence will not arrive before the work; it will be made inside it.",
+                },
+                {
+                    "past": "I used to imagine us doing something important, and this feels like a doorway.",
+                    "future": "Let importance become practice, not pressure; return to the work one piece at a time.",
+                },
+                {
+                    "past": "Can we bring snacks, curiosity, and a very brave pencil?",
+                    "future": "Give the work a simple ritual; repetition will carry you when motivation flickers.",
+                },
+                {
+                    "past": "I am proud that we are trying before we know how to be perfect.",
+                    "future": "Trying before certainty is how every real path begins.",
+                },
+                {
+                    "past": "This room feels bigger than us, but I want to look around anyway.",
+                    "future": "You will grow into spaces that once felt too large; stay present long enough to learn their shape.",
+                },
+                {
+                    "past": "Let us collect one new idea like a shiny stone.",
+                    "future": "One careful idea at a time is enough to build a body of work.",
+                },
+            ],
+        ),
+        (
+            ["alone", "lonely", "miss", "missing", "孤独", "想念", "一个人", "寂寞"],
+            [
+                {
+                    "past": "What if loneliness is a room where we can light one tiny lamp?",
+                    "future": "This lonely moment is real, but it is not permanent; reach for one small signal.",
+                },
+                {
+                    "past": "Even when it feels quiet, we are still here together inside the same little heart.",
+                    "future": "You are not empty; you are waiting for connection, and it can still find you.",
+                },
+                {
+                    "past": "I will draw a door in this lonely room, just in case someone kind is near.",
+                    "future": "Stay open by one inch today; that is enough for life to come closer.",
+                },
+                {
+                    "past": "Maybe we can send one small signal out and see what answers.",
+                    "future": "Reach gently, not desperately; one honest message can change the temperature of the day.",
+                },
+                {
+                    "past": "Let us make the silence less empty by being gentle inside it.",
+                    "future": "The part of you that wants connection is wise; listen to it without shame.",
+                },
+                {
+                    "past": "I can sit next to you in the quiet and swing my feet until it feels less scary.",
+                    "future": "You can be alone in this hour and still deeply connected to what is coming.",
+                },
+                {
+                    "past": "Let us write our name in the dark, just to remember we are here.",
+                    "future": "Your presence matters even before someone else witnesses it.",
+                },
+                {
+                    "past": "Maybe the next kind voice is already walking toward us.",
+                    "future": "Do not close the door because this room is quiet; connection can arrive softly.",
+                },
+            ],
+        ),
+        (
+            ["change", "move", "moving", "new life", "choice", "decision", "变化", "改变", "选择", "决定"],
+            [
+                {
+                    "past": "New doors are strange, but I want to touch the handle and see what shines there.",
+                    "future": "Change does not erase you; it reveals which parts of you know how to grow.",
+                },
+                {
+                    "past": "Maybe changing is how we find the colors we did not know we had.",
+                    "future": "Let the next version arrive slowly; you only need to choose with honesty today.",
+                },
+                {
+                    "past": "We can carry our little old self with us and still step into the new place.",
+                    "future": "The old life taught you something, and the new one will not require you to disappear.",
+                },
+                {
+                    "past": "I am scared too, but I am also excited, and that tiny excitement matters.",
+                    "future": "You can be afraid and still correct; courage often feels like uncertainty at first.",
+                },
+                {
+                    "past": "Let us pack curiosity first; it always fits in the smallest bag.",
+                    "future": "This threshold is not here to punish you; it is here because life is opening.",
+                },
+                {
+                    "past": "If we are becoming someone new, can we bring our favorite old stars?",
+                    "future": "You do not have to abandon your history to become more free.",
+                },
+                {
+                    "past": "The new place feels wobbly, but wobbly can still be wonderful.",
+                    "future": "Let instability be temporary information, not proof that you chose wrong.",
+                },
+                {
+                    "past": "I want to peek into the next chapter before we decide to be afraid of it.",
+                    "future": "Meet the next chapter with attention; fear does not get to summarize it first.",
+                },
+            ],
+        ),
+        (
+            ["angry", "mad", "frustrated", "unfair", "annoyed", "生气", "愤怒", "不公平", "烦"],
+            [
+                {
+                    "past": "That fire means something matters; let us hold it carefully so it does not burn us.",
+                    "future": "Your anger may be pointing toward a boundary; listen, then answer with steadiness.",
+                },
+                {
+                    "past": "I can stomp my feet with you, then we can decide what the fire is protecting.",
+                    "future": "Do not let the heat choose your whole response; let it show you what needs protection.",
+                },
+                {
+                    "past": "Maybe anger is a little guard dog barking because our heart needs care.",
+                    "future": "You can be firm without becoming cruel; that is where your power becomes clear.",
+                },
+                {
+                    "past": "We do not have to be polite to the feeling before we understand it.",
+                    "future": "The feeling is valid; the next move can still be wise.",
+                },
+                {
+                    "past": "Something in us knows we deserve care; that is why the feeling is so bright.",
+                    "future": "Let the fire become a boundary, not a wound you carry alone.",
+                },
+                {
+                    "past": "I want to draw a red circle around what hurt us and say: this matters.",
+                    "future": "Name what was crossed; clarity will help you respond without losing yourself.",
+                },
+                {
+                    "past": "The spark is loud because our little heart is defending something precious.",
+                    "future": "Protect what matters, but let your response be shaped by dignity.",
+                },
+                {
+                    "past": "Let us breathe on the flame until it becomes a lantern.",
+                    "future": "Anger can become guidance when you give it a clean direction.",
+                },
+            ],
+        ),
+        (
+            ["overwhelmed", "too much", "busy", "pressure", "stress", "压力", "太多", "忙", "崩溃"],
+            [
+                {
+                    "past": "Everything feels huge, so let us make it tiny: one breath, one corner, one little task.",
+                    "future": "Reduce the scale until the next action becomes visible; that is not weakness, it is strategy.",
+                },
+                {
+                    "past": "What if we put the giant pile into small boxes and open only one?",
+                    "future": "Pressure gets quieter when it becomes a list, a boundary, and one first step.",
+                },
+                {
+                    "past": "I know it looks like a mountain, but I found a pebble we can move first.",
+                    "future": "You are allowed to simplify; a smaller plan is still a real plan.",
+                },
+                {
+                    "past": "Let us not fight the whole storm; let us find one dry match.",
+                    "future": "Do less, more clearly; that is how you return to yourself.",
+                },
+                {
+                    "past": "One tiny task is still a lantern.",
+                    "future": "The whole weight is not yours to solve at once; begin where your hands can reach.",
+                },
+                {
+                    "past": "I want to put the noisy things in a basket and choose just one.",
+                    "future": "Contain the chaos before you solve it; one chosen priority can restore the ground.",
+                },
+                {
+                    "past": "If everything is shouting, let us answer the smallest voice first.",
+                    "future": "The smallest next step is not lesser; it is the doorway back to agency.",
+                },
+                {
+                    "past": "Let us make the mountain into stairs and only stand on the first one.",
+                    "future": "You are allowed to proceed by sequence; not everything deserves your body at once.",
+                },
+            ],
+        ),
+    ]
+
+    general_pairs = [
+        {
+            "past": "What if this moment is not a test, but a doorway we can peek through slowly?",
+            "future": "This moment does not need to make sense yet; keep breathing and let the next step appear.",
+        },
+        {
+            "past": "We can be unsure and still be full of little lights; let us follow one of them.",
+            "future": "You do not need certainty to continue; you need one grounded action and a little patience.",
+        },
+        {
+            "past": "Let us look for the smallest bright clue and follow it with soft feet.",
+            "future": "There is still a way through this; make the next choice smaller, kinder, and possible.",
+        },
+        {
+            "past": "Maybe this is the part where we become brave without noticing.",
+            "future": "Trust the quiet part that still wants to live forward; it has carried you before.",
+        },
+        {
+            "past": "Let us hold this moment like a mystery, not a verdict.",
+            "future": "Let hope be practical today: one breath, one boundary, one small beginning.",
+        },
+        {
+            "past": "There is still a tiny door somewhere; I want to look for it with you.",
+            "future": "Let the next step be small enough that you can actually take it.",
+        },
+        {
+            "past": "I do not know the answer yet, but I know we are still becoming.",
+            "future": "You are allowed to become gradually; nothing essential is lost by moving gently.",
+        },
+        {
+            "past": "Let us carry this question like a glowing marble and see where it leads.",
+            "future": "Some answers arrive only after you keep living; keep the question warm, not heavy.",
+        },
+        {
+            "past": "Maybe today is asking us to be curious before we are certain.",
+            "future": "Curiosity will keep you open while certainty is still forming.",
+        },
+        {
+            "past": "I am here with wide eyes, ready to believe something can still unfold.",
+            "future": "Something is still unfolding; meet it with patience and one honest choice.",
+        },
+        {
+            "past": "Let us be kind to the version of us who is still figuring it out.",
+            "future": "The unfinished version of you is not a failure; it is the living version.",
+        },
+        {
+            "past": "I want to put a small star beside this moment so we remember we passed through it.",
+            "future": "You will look back and see this as movement, even if it feels still today.",
+        },
+    ]
+
+    for keywords, pairs in themes:
+        if any(keyword in lowered for keyword in keywords):
+            pair = random.choice(pairs)
+            return pair["past"], pair["future"]
+
+    pair = random.choice(general_pairs)
+    return pair["past"], pair["future"]
+
+
+def is_positive_situation(situation):
+    """Detect clearly bright/excited visitor input."""
+
+    positive_keywords = [
+        "happy",
+        "excited",
+        "exciting",
+        "proud",
+        "good",
+        "great",
+        "joy",
+        "joyful",
+        "glad",
+        "thrilled",
+        "hopeful",
+        "looking forward",
+        "celebrate",
+        "success",
+        "开心",
+        "高兴",
+        "兴奋",
+        "期待",
+        "快乐",
+        "骄傲",
+        "很开心",
+        "很棒",
+        "成功",
+    ]
+    lowered = situation.lower()
+    return any(keyword in lowered for keyword in positive_keywords)
+
+
+def response_sounds_too_comforting_for_positive_mood(*responses):
+    """Reject local AI answers that comfort sadness when the input is joyful."""
+
+    comfort_words = [
+        "sad",
+        "sadness",
+        "hurt",
+        "heavy",
+        "fear",
+        "afraid",
+        "worry",
+        "worried",
+        "anxious",
+        "lonely",
+        "alone",
+        "not alone",
+        "breathe",
+        "through this",
+        "难过",
+        "伤心",
+        "害怕",
+        "焦虑",
+        "孤独",
+    ]
+    combined = " ".join(responses).lower()
+    return any(word in combined for word in comfort_words)
+
+
 def run_local_with_timeout(function, situation, timeout_seconds):
     """Try one local AI call, then stop waiting if the Pi is too slow.
 
@@ -729,6 +1326,16 @@ def respond():
                 max(0.1, deadline - time.monotonic()),
             )
             response_source = "local"
+
+            # Small local models sometimes answer happy/excited input with
+            # generic comfort language.  For the exhibition, a matched mock
+            # pair is better than a mismatched AI answer.
+            if is_positive_situation(situation) and response_sounds_too_comforting_for_positive_mood(
+                past_response,
+                future_response,
+            ):
+                past_response, future_response = create_mock_responses(situation)
+                response_source = "mock-theme"
         except TimeoutError as error:
             ai_error = str(error)
             past_response, future_response = create_mock_responses(situation)
