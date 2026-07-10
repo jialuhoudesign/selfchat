@@ -77,6 +77,8 @@
   const caption = document.getElementById("voice-caption");
   const listening = document.getElementById("listening");
   let lastVersion = -1;
+  let returnToOpeningTimer = null;
+  const RETURN_TO_OPENING_MS = 30000;
 
   const opening = {
     past: {
@@ -91,10 +93,40 @@
     },
   };
 
+  function showOpening() {
+    document.body.classList.remove("is-thinking");
+    voice.hidden = false;
+    listening.classList.remove("is-visible");
+    listening.setAttribute("aria-hidden", "true");
+
+    const text = opening[selfType];
+    voice.classList.remove("is-changing");
+    intro.textContent = text.intro;
+    message.textContent = text.message;
+    caption.textContent = text.caption;
+    void voice.offsetWidth;
+    voice.classList.add("is-changing");
+  }
+
+  function scheduleReturnToOpening() {
+    if (returnToOpeningTimer) {
+      window.clearTimeout(returnToOpeningTimer);
+    }
+
+    returnToOpeningTimer = window.setTimeout(() => {
+      showOpening();
+      returnToOpeningTimer = null;
+    }, RETURN_TO_OPENING_MS);
+  }
+
   function changeMessage(state) {
     const response = state[`${selfType}_response`];
 
     if (state.status === "thinking" && !response) {
+      if (returnToOpeningTimer) {
+        window.clearTimeout(returnToOpeningTimer);
+        returnToOpeningTimer = null;
+      }
       document.body.classList.add("is-thinking");
       voice.hidden = true;
       listening.classList.add("is-visible");
@@ -118,6 +150,10 @@
     caption.textContent = text.caption;
     void voice.offsetWidth;
     voice.classList.add("is-changing");
+
+    if (response) {
+      scheduleReturnToOpening();
+    }
   }
 
   async function updateFromServer() {
